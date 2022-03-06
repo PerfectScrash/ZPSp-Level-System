@@ -4,9 +4,9 @@
 	-> Description:
 	This plugin will be turn your zombie plague into zombie plague xp, with rank etc
 
-	-> How to use require level for a class/item (Cooming Soon):
-	When plugin enables, will be add a level line in **zpsp_zombieclasses.ini**, **zpsp_humanclasses.ini** 
-	and **zpsp_extraitems.ini** and you can change minimum level require for use this item/class
+	-> How to use require level for a class/item/weapon:
+	When plugin enables, will be add a level line in **zpsp_zombieclasses.ini**, **zpsp_humanclasses.ini**, **zpsp_extraitems.ini**
+	and **zpsp_custom_weapons.ini** and you can change minimum level require for use this item/class/weapon
 
 	-> Changelog:
 		- Alpha (06/22): First release
@@ -20,6 +20,7 @@
 #include <amxmisc>
 #include <cstrike>
 #include <nvault>
+#include <amx_settings_api>
 #include <zombie_plague_special>
 
 new const ZPSP_XP_CFG_FILE[] = "zpsp_configs/zpsp_xp_system.cfg"
@@ -130,6 +131,7 @@ new g_iPlayerXP[33], g_iPlayerLevel[33], szPlayerAuthid[33][33], szPlayerName[33
 // Cvars
 new g_Vault, cvar_savetype, cvar_xp_kill, cvar_xp_kill_specials, cvar_xp_infect;
 new g_fUserLevelUp, g_SaveType
+new Array:g_ItemLevel, Array:g_ZombieClassLevel, Array:g_HumanClassLevel, Array:g_WpnPrimaryLevel, Array:g_WpnSecondaryLevel
 
 public plugin_init() {
 	// Register Plugin
@@ -165,6 +167,81 @@ public plugin_cfg() {
 		set_fail_state("Error opening Rank System nVault, file does not exist!")
 
 	g_SaveType = get_pcvar_num(cvar_savetype)
+
+
+	// Load level Itens
+	load_level_itens();
+}
+
+public load_level_itens() {
+	// Create Arrays
+	g_ItemLevel = ArrayCreate(1, 1)
+	g_ZombieClassLevel = ArrayCreate(1, 1)
+	g_HumanClassLevel = ArrayCreate(1, 1)
+	g_WpnPrimaryLevel = ArrayCreate(1, 1)
+	g_WpnSecondaryLevel = ArrayCreate(1, 1)
+
+	static index, count, real_name[32], level
+
+	// Zombie Class Level
+	count = zp_get_zclass_count()
+	for (index = 0; index < count; index++) {
+		zp_get_zombie_class_realname(index, real_name, charsmax(real_name))
+		
+		level = 0
+		if(!amx_load_setting_int(ZP_ZOMBIECLASSES_FILE, real_name, "LEVEL", level))
+			amx_save_setting_int(ZP_ZOMBIECLASSES_FILE, real_name, "LEVEL", level)
+
+		ArrayPushCell(g_ZombieClassLevel, level)
+	}
+
+	// Human Class Level
+	count = zp_get_hclass_count()
+	for (index = 0; index < count; index++) {
+		zp_get_human_class_realname(index, real_name, charsmax(real_name))
+		
+		level = 0
+		if(!amx_load_setting_int(ZP_HUMANCLASSES_FILE, real_name, "LEVEL", level))
+			amx_save_setting_int(ZP_HUMANCLASSES_FILE, real_name, "LEVEL", level)
+
+		ArrayPushCell(g_HumanClassLevel, level)
+	}
+
+	// Extra Item (Include Main Plugin Extra Itens)
+	count = zp_get_extra_item_count()
+	for (index = 0; index < count; index++) {
+		zp_get_extra_item_realname(index, real_name, charsmax(real_name))
+		
+		level = 0		
+		if (!amx_load_setting_int(ZP_EXTRAITEMS_FILE, real_name, "LEVEL", level))
+			amx_save_setting_int(ZP_EXTRAITEMS_FILE, real_name, "LEVEL", level)
+		
+		ArrayPushCell(g_ItemLevel, level)
+	}
+	
+	// Player Primary Weapons (Include Main Plugin Player Weapons)
+	count = zp_weapon_count(WPN_PRIMARY, 0)
+	for (index = 0; index < count; index++) {
+		zp_get_weapon_realname(WPN_PRIMARY, index, real_name, charsmax(real_name))
+		
+		level = 0		
+		if (!amx_load_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level))
+			amx_save_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level)
+		
+		ArrayPushCell(g_WpnPrimaryLevel, level)
+	}
+	
+	// Player Secondary Weapons (Include Main Plugin Player Weapons)
+	count = zp_weapon_count(WPN_SECONDARY, 0)
+	for (index = 0; index < count; index++) {
+		zp_get_weapon_realname(WPN_SECONDARY, index, real_name, charsmax(real_name))
+		
+		level = 0		
+		if (!amx_load_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level))
+			amx_save_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level)
+		
+		ArrayPushCell(g_WpnSecondaryLevel, level)
+	}
 }
 
 public client_authorized(id) {
@@ -194,6 +271,36 @@ public client_infochanged(id) {
 	return PLUGIN_CONTINUE;
 }
 
+/*--------------------------------*
+* Class/Item/Weapon Level *
+*--------------------------------*/
+public zp_zombie_class_choosed_pre(id, classid) { // Zombie Class Level
+	return check_class_item_level(id, classid, g_ZombieClassLevel);
+}
+public zp_human_class_choosed_pre(id, classid) { // Human Class Level
+	return check_class_item_level(id, classid, g_HumanClassLevel);
+}
+public zp_extra_item_selected_pre(id, itemid) { // Extra Item Level
+	return check_class_item_level(id, itemid, g_ItemLevel);
+}
+public zp_weapon_selected_pre(id, wpn_type, wpn_id) { // Player Weapon Level
+	return check_class_item_level(id, wpn_id, (wpn_type == WPN_PRIMARY) ? g_WpnPrimaryLevel : g_WpnSecondaryLevel);
+}
+// Check Class/Item/Weapon Level
+stock check_class_item_level(id, itemid, Array:Arr_Level) {
+	// Prevent log error
+	if(itemid < 0 || itemid >= ArraySize(Arr_Level))
+		return PLUGIN_CONTINUE;
+	
+	static level
+	level = ArrayGetCell(Arr_Level, itemid)
+	if(g_iPlayerLevel[id] < level) {
+		zp_menu_textadd(fmt("\r[Level %d]", level))
+		return ZP_PLUGIN_HANDLED;
+	}
+	return PLUGIN_CONTINUE;
+}
+
 /*---------------*
 * Hud *
 *----------------*/
@@ -219,7 +326,7 @@ public zp_player_show_hud(id, target, SpHudType:hudtype) {
 	else if(hudtype == HUD_ANTRAX_STYLE || hudtype == HUD_CENTER_ANTRAX)
 		zp_add_hud_text(fmt("^n[XP] [%i / %i] - [Level] [%i / %i]^n[Rank] [%s]", g_iPlayerXP[id], xpnext, g_iPlayerLevel[id], MAXLEVEL, g_mPlayerData[g_iPlayerLevel[id]][m_szRankName]))
 	else if(hudtype == HUD_CLASSIC)
-		zp_add_hud_text(fmt("- Rank: %s - XP: %i / %i - Level: %i / %i", g_mPlayerData[g_iPlayerLevel[id]][m_szRankName], g_iPlayerXP[id], xpnext, g_iPlayerLevel[id], MAXLEVEL))
+		zp_add_hud_text(fmt("- Rank: %s - XP: %i/%i - Level: %i/%i", g_mPlayerData[g_iPlayerLevel[id]][m_szRankName], g_iPlayerXP[id], xpnext, g_iPlayerLevel[id], MAXLEVEL))
 }
 
 /*---------------*
