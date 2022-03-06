@@ -19,7 +19,8 @@
 #include <amxmodx>
 #include <amxmisc>
 #include <cstrike>
-#include <nvault>
+#include <fvault>
+#include <hamsandwich>
 #include <amx_settings_api>
 #include <zombie_plague_special>
 
@@ -123,13 +124,13 @@ new const g_iCommandSettings[][eCommandSettings] =
 }
 
 new const PrefixChat[] = { "XP System" };
-new const g_szLevelUp[] = { "items/nvg_on.wav" };
+new const g_szLevelUp[] = { "vox/doop.wav" };
 
 // Integers	
 new g_iPlayerXP[33], g_iPlayerLevel[33], szPlayerAuthid[33][33], szPlayerName[33][33], szPlayerIP[33][33], g_iPlayerMenu[33]
 
 // Cvars
-new g_Vault, cvar_savetype, cvar_xp_kill, cvar_xp_kill_specials, cvar_xp_infect;
+new cvar_savetype, cvar_xp_kill, cvar_xp_kill_specials, cvar_xp_infect;
 new g_fUserLevelUp, g_SaveType
 new Array:g_ItemLevel, Array:g_ZombieClassLevel, Array:g_HumanClassLevel, Array:g_WpnPrimaryLevel, Array:g_WpnSecondaryLevel
 
@@ -138,8 +139,8 @@ public plugin_init() {
 	register_plugin("[ZPSp] Addon: XP System", "1.0", "Supremache | Perf. Scrash");
 
 	// Register Events
-	register_event("DeathMsg", "Event_DeathMsg", "a");
-	
+	RegisterHam(Ham_Killed, "player", "fw_PlayerKilled_Post", 1)
+
 	// Save Data Type: (1 - Authid | 2 = Name | 3 = IP)
 	cvar_savetype = register_cvar("zp_xp_save_type", "1")
 	
@@ -150,7 +151,7 @@ public plugin_init() {
 
 	// Register Client Commands
 	register_clcmd("say", "CommandSay")
-	register_concmd("amx_givelvl", "GiveLevels", ADMIN_LEVEL_E, " <player> <quantity>");
+	register_concmd("amx_setlvl", "SetLevels", ADMIN_LEVEL_E, " <player> <quantity>");
 	register_concmd("amx_givexp", "GiveEXP", ADMIN_LEVEL_E, " <player> <quantity>");
 		
 	// Forward
@@ -160,14 +161,7 @@ public plugin_init() {
 public plugin_cfg() {
 	static cfgdir[32]; get_configsdir(cfgdir, charsmax(cfgdir)) // Get configs dir
 	server_cmd("exec %s/%s", cfgdir, ZPSP_XP_CFG_FILE) // Execute .cfg config file
-
-	g_Vault = nvault_open(VAULT_NAME)
-
-	if(g_Vault == INVALID_HANDLE)
-		set_fail_state("Error opening Rank System nVault, file does not exist!")
-
 	g_SaveType = get_pcvar_num(cvar_savetype)
-
 
 	// Load level Itens
 	load_level_itens();
@@ -220,11 +214,16 @@ public load_level_itens() {
 	}
 	
 	// Player Primary Weapons (Include Main Plugin Player Weapons)
+	static start
 	count = zp_weapon_count(WPN_PRIMARY, 0)
+	start = zp_weapon_count(WPN_PRIMARY, 2)
 	for (index = 0; index < count; index++) {
 		zp_get_weapon_realname(WPN_PRIMARY, index, real_name, charsmax(real_name))
 		
-		level = 0		
+		if(index >= start)
+			format(real_name, charsmax(real_name), "Pri:%s", real_name)
+
+		level = 0
 		if (!amx_load_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level))
 			amx_save_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level)
 		
@@ -233,8 +232,12 @@ public load_level_itens() {
 	
 	// Player Secondary Weapons (Include Main Plugin Player Weapons)
 	count = zp_weapon_count(WPN_SECONDARY, 0)
+	start = zp_weapon_count(WPN_SECONDARY, 2)
 	for (index = 0; index < count; index++) {
 		zp_get_weapon_realname(WPN_SECONDARY, index, real_name, charsmax(real_name))
+
+		if(index >= start)
+			format(real_name, charsmax(real_name), "Sec:%s", real_name)
 		
 		level = 0		
 		if (!amx_load_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level))
@@ -312,11 +315,11 @@ public zp_player_show_hud(id, target, SpHudType:hudtype) {
 		else 
 			xpnext = g_mPlayerData[g_iPlayerLevel[target]+1][m_iRankXP] 
 
-		zp_add_hud_text(fmt("- Rank: %s - XP: %i / %i - Level: %i / %i", g_mPlayerData[g_iPlayerLevel[target]][m_szRankName], g_iPlayerXP[target], xpnext, g_iPlayerLevel[target], MAXLEVEL))
+		zp_add_hud_text(fmt("^nRank: %s - XP: %i / %i - Level: %i / %i", g_mPlayerData[g_iPlayerLevel[target]][m_szRankName], g_iPlayerXP[target], xpnext, g_iPlayerLevel[target], MAXLEVEL))
 		return;
 	}
 
-	if(g_iPlayerLevel[target] >= MAXLEVEL)
+	if(g_iPlayerLevel[id] >= MAXLEVEL)
 		xpnext = g_mPlayerData[g_iPlayerLevel[id]][m_iRankXP] 
 	else 
 		xpnext = g_mPlayerData[g_iPlayerLevel[id]+1][m_iRankXP] 
@@ -519,7 +522,7 @@ public GiveEXP(id, nLevel, nCid) {
 /*---------------*
 * Give Levels *
 *----------------*/
-public GiveLevels(id, nLevel, nCid) {
+public SetLevels(id, nLevel, nCid) {
 	if(!cmd_access(id, nLevel, nCid, 1))
 		return PLUGIN_HANDLED
 	
@@ -543,29 +546,21 @@ public GiveLevels(id, nLevel, nCid) {
 		return PLUGIN_HANDLED
 	}
 	
-	if(g_iPlayerLevel[iTarget] >= MAXLEVEL) {
-		console_print(id, "[%s] You can't give this player more levels, because he reached max level %d.", PrefixChat, MAXLEVEL);
-		client_print_color(id, print_team_default, "^4[%s]^1 You can't give this player more levels, because he reached max level (^4%d^1).", PrefixChat, MAXLEVEL);
-		return PLUGIN_HANDLED
-	}
+	if(iLevel > MAXLEVEL)
+		iLevel = MAXLEVEL
+
+	if(iLevel < 0)
+		iLevel = 0
 	
-	if(g_iPlayerLevel[iTarget] + iLevel > MAXLEVEL) {
-		new iAvailableLvl = MAXLEVEL - g_iPlayerLevel[iTarget]
-		
-		console_print(id, "[%s] You can't give this player quantities more the current levels %d.", PrefixChat, MAXLEVEL);
-		client_print_color(id, print_team_default, "^4[%s]^1 You can't give this player quantities more the current levels (^4%d^1).", PrefixChat, MAXLEVEL);
-		client_print_color(id, print_team_default, "^4[%s]^1 Available levels (^4%d^1).", PrefixChat, iAvailableLvl);
-		
-		return PLUGIN_HANDLED
-	}
+	g_iPlayerLevel[iTarget] = iLevel
+	g_iPlayerXP[iTarget] = g_mPlayerData[g_iPlayerLevel[iTarget]][m_iRankXP] 
+	client_cmd(iTarget, "spk %s", g_szLevelUp)
+	SaveData(iTarget)
 	
-	g_iPlayerLevel[iTarget] += iLevel
-	CheckLevel(iTarget)
+	console_print(id, "[ADMIN] %s set %d level to %s", szPlayerName[id], iLevel, szPlayerName[iTarget]);
+	Log("[ADMIN] %s <%s> set %d levels for %s <%s>", szPlayerName[id], szPlayerAuthid[id], iLevel, szPlayerName[iTarget], szPlayerAuthid[iTarget]);
 	
-	console_print(id, "[ADMIN] %s gave %d level to %s", szPlayerName[id], iLevel, szPlayerName[iTarget]);
-	Log("[ADMIN] %s <%s> gave %d levels for %s <%s>", szPlayerName[id], szPlayerAuthid[id], iLevel, szPlayerName[iTarget], szPlayerAuthid[iTarget]);
-	
-	client_print_color(0, print_team_default, "^1[ADMIN]^4 %s^1: gave^4 %d^1 levels for^4 %s^1", szPlayerName[id], iLevel, szPlayerName[iTarget]);
+	client_print_color(0, print_team_default, "^1[ADMIN]^4 %s^1: set^4 %d^1 levels for^4 %s^1", szPlayerName[id], iLevel, szPlayerName[iTarget]);
 	client_print_color(iTarget, print_team_default, "^4[%s]^1 You have reached: Rank.^4%s^1, Lv.^4%d^1.", PrefixChat, g_mPlayerData[g_iPlayerLevel[iTarget]][m_szRankName], g_iPlayerLevel[iTarget]);
 		
 	return PLUGIN_HANDLED
@@ -575,13 +570,10 @@ public GiveLevels(id, nLevel, nCid) {
 /*---------------*
 * Kill XP Amount *
 *----------------*/
-public Event_DeathMsg() {
-	static XPAmount, attacker, victim
-	attacker = read_data(1);
-	victim = read_data(2);
-	
+public fw_PlayerKilled_Post(victim, attacker) {
+	static XPAmount
 	if(attacker == victim || !is_user_connected(attacker) || !is_user_connected(victim))
-		return;
+		return HAM_IGNORED;
 	
 	if(zp_get_human_special_class(victim) || zp_get_zombie_special_class(victim))
 		XPAmount = get_pcvar_num(cvar_xp_kill_specials);
@@ -590,6 +582,7 @@ public Event_DeathMsg() {
 	
 	g_iPlayerXP[attacker] += XPAmount;
 	CheckLevel(attacker);
+	return HAM_IGNORED;
 }
 public zp_user_infected_post(victim, infector) {
 	if(infector == victim || !is_user_connected(infector) || !is_user_connected(victim))
@@ -611,13 +604,15 @@ public zp_user_humanized_post(victim, classid, attacker) {
 * Check Levels *
 *----------------*/
 public CheckLevel(iPlayer) {
-	if(g_iPlayerLevel[iPlayer] >= MAXLEVEL) 
-		return 0;
+	if(g_iPlayerLevel[iPlayer] >= MAXLEVEL) {
+		SaveData(iPlayer)
+		return;
+	}
 	
-	while(g_iPlayerXP[iPlayer] >= g_mPlayerData[g_iPlayerLevel[iPlayer] + 1][m_iRankXP]) {
+	while(g_iPlayerXP[iPlayer] >= g_mPlayerData[g_iPlayerLevel[iPlayer]+1][m_iRankXP]) {
 		g_iPlayerLevel[iPlayer]++;
-		new iReturn
 		client_cmd(iPlayer, "spk %s", g_szLevelUp)
+		new iReturn
 		ExecuteForward(g_fUserLevelUp, iReturn, iPlayer, g_iPlayerLevel[iPlayer], g_iPlayerXP[iPlayer])
 		client_print_color(0, print_team_default, "^4[%s]^1 Player^4 %s^1 have been promoted to^4 %s^1 (^4Lv. %d^1)", 
 		PrefixChat, 
@@ -625,7 +620,7 @@ public CheckLevel(iPlayer) {
 		g_mPlayerData[g_iPlayerLevel[iPlayer]][m_szRankName], 
 		g_iPlayerLevel[iPlayer]);
 	}
-	return 1;
+	SaveData(iPlayer)
 }
 			
 /*---------------*
@@ -643,8 +638,8 @@ stock SaveData(id) {
 			formatex(szKey, charsmax(szKey), "%s-ID", szPlayerAuthid[id])
 	}
 	
-	formatex(szData, charsmax(szData), "%i#%i#", g_iPlayerLevel[id], g_iPlayerXP[id])	
-	nvault_pset(g_Vault, szKey, szData);
+	formatex(szData, charsmax(szData), "%i#%i#", g_iPlayerLevel[id], g_iPlayerXP[id])
+	fvault_set_data(VAULT_NAME, szKey, szData)
 }
 
 stock LoadData(id) {
@@ -660,7 +655,7 @@ stock LoadData(id) {
 	}
 	
 	formatex(szData, charsmax(szData), "%i#%i#", g_iPlayerLevel[id], g_iPlayerXP[id])
-	nvault_get(g_Vault, szKey, szData, charsmax(szData))
+	fvault_get_data(VAULT_NAME, szKey, szData, charsmax(szData))
 		
 	replace_string(szData, charsmax(szData), "#", " ")
 	parse(szData, szLevel, charsmax(szLevel), szXP, charsmax(szXP))
@@ -744,9 +739,3 @@ public _get_user_next_rank(iPlugin, iParams)
 
 public _get_max_levels(iPlugin, iParams)
 	return MAXLEVEL;
-
-/*--------------*
-* PLUGIN END *
-*---------------*/
-public plugin_end()
-	nvault_close(g_Vault);
