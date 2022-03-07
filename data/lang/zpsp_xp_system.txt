@@ -1,0 +1,59 @@
+[en]
+ZP_XP_PREFIX = ^4[ZPSp XP]^1
+ZP_XP_NOACESS = You dont have access.
+ZP_XP_ADM_RESET = ^4*ADMIN*^1 %s^3: reset rank data of ^1[%s]
+ZP_XP_ADM_SET_LVL = ^4*ADMIN*^1 %s^3: set ^1[%s]^3 to level ^1[%d]^3 (^1Rank: %s^3)
+ZP_XP_ADM_GIVE_XP = ^4*ADMIN*^1 %s^3: gave ^1[%d XP(s)]^3 for ^3[%s]^1
+ZP_XP_REACHED = You have reached: XP ^3[%d / %d]^1.
+ZP_RANK_REACHED = You have reached: Rank: ^3[%s]^1 Level: ^3[%d]^1.
+ZP_XP_PROMOTED = Player ^3[%s]^1 have been promoted to level ^3%d^1 (^3Rank: %s^1)
+ZP_XP = XP(s)
+ZP_LEVEL = Level
+ZP_RANK = Rank
+
+ZP_XP_CMD_ERROR1 = Usage: amx_givexp <player name> <quantity>
+ZP_XP_CMD_ERROR2 = Invalid player or matching multiple targets!
+ZP_XP_CMD_ERROR3 = Usage: amx_setlvl <player Name> <quantity>
+
+ZP_XP_ADM_GIVE_XP_LOG = *ADMIN* %s <%s>: gave [%d XP(s)] for [%s] <%s>
+ZP_XP_ADM_SET_LVL_LOG = *ADMIN* %s <%s>: set [%s] <%s> to level [%d] (Rank: %s)
+ZP_XP_ADM_RESET_LOG = *ADMIN* %s <%s>: reset rank data of [%s] <%s>
+
+ZP_XP_MENU_PREFIX = \y[ZPSp XP]\w
+ZP_XP_MENU_RESET = Reset Data
+ZP_XP_MENU_MANAGE = Manage Players
+ZP_XP_MENU_LIST = XP List
+
+ZP_XP_MENU_BACK = Back
+ZP_XP_MENU_NEXT = Next
+ZP_XP_MENU_EXIT = Exit
+
+[bp]
+ZP_XP_PREFIX = ^4[ZPSp XP]^1
+ZP_XP_NOACESS = Voce nao tem acesso !!!
+ZP_XP_ADM_RESET = ^4*ADMIN*^1 %s^3: resetou o xp do jogador ^1[%s]
+ZP_XP_ADM_SET_LVL = ^4*ADMIN*^1 %s^3: Mudou o level do jogador ^1[%s]^3 para o level ^1[%d]^3 (^1Rank: %s^3)
+ZP_XP_ADM_GIVE_XP = ^4*ADMIN*^1 %s^3: Adicionou ^1[%d XP(s)]^3 para o jogador ^3[%s]^1
+ZP_XP_REACHED = Voce chegou ao XP ^3[%d / %d]^1.
+ZP_RANK_REACHED = Voce chegou ao Rank: ^3[%s]^1 e ao Level: ^3[%d]^1.
+ZP_XP_PROMOTED = Jogador ^3[%s]^1 chegou ao nivel ^3%d^1 (^3Rank: %s^1)
+ZP_XP = XP(s)
+ZP_LEVEL = Level
+ZP_RANK = Rank
+
+ZP_XP_CMD_ERROR1 = Uso: amx_givexp <nome> <quantidade>
+ZP_XP_CMD_ERROR2 = Jogador invalido ou multiplos alvos
+ZP_XP_CMD_ERROR3 = Uso: amx_setlvl <nome> <quantidade>
+
+ZP_XP_ADM_GIVE_XP_LOG = *ADMIN* %s <%s>: adicionou [%d XP(s)] para o jogador [%s] <%s>
+ZP_XP_ADM_SET_LVL_LOG = *ADMIN* %s <%s>: mudou o level do jogador [%s] <%s> para o level [%d] (Rank: %s)
+ZP_XP_ADM_RESET_LOG = *ADMIN* %s <%s>: resetou o xp do jogador [%s] <%s>
+
+ZP_XP_MENU_PREFIX = \y[ZPSp XP]\w
+ZP_XP_MENU_RESET = Resetar dados
+ZP_XP_MENU_MANAGE = Gerenciar niveis
+ZP_XP_MENU_LIST = Lista de XP
+
+ZP_XP_MENU_BACK = Voltar
+ZP_XP_MENU_NEXT = Proximo
+ZP_XP_MENU_EXIT = Sair
