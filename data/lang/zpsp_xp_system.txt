@@ -28,6 +28,19 @@ ZP_XP_MENU_BACK = Back
 ZP_XP_MENU_NEXT = Next
 ZP_XP_MENU_EXIT = Exit
 
+ZP_XP_NO_UPGRADES = Upgrades are disabled.
+ZP_XP_MENU_UPGRADES = Upgrades Menu
+ZP_ITEM_UPGRADE_BUY = Buy Upgrade
+ZP_ITEM_UPGRADE_SELL = Sell Upgrade
+ZP_UPGRADE_ITEM_NAME = Item: \r[%s]
+ZP_UPGRADE_ITEM_LEVEL = Level: \r[%d/%d]
+ZP_UPGRADE_ITEM_DESC = Description: \w%s
+ZP_XP_UPGRADE_MAX_BUY = Max bought upgrades
+ZP_NOT_HAVE_ENGOUT_XP = You dont have engout XP(s)
+ZP_UPGRADE_BUY_SUCCESS = You bought ^3[%s]^1 level ^3[%d]^1 with sucess.
+ZP_XP_UPGRADE_MAX_SELL = Min level reached. You cant sell
+ZP_UPGRADE_SELL_SUCCESS = You sold ^3[%s]^1 level ^3[%d]^1 with sucess.
+
 [bp]
 ZP_XP_PREFIX = ^4[ZPSp XP]^1
 ZP_XP_NOACESS = Voce nao tem acesso !!!
@@ -57,3 +70,16 @@ ZP_XP_MENU_LIST = Lista de XP
 ZP_XP_MENU_BACK = Voltar
 ZP_XP_MENU_NEXT = Proximo
 ZP_XP_MENU_EXIT = Sair
+
+ZP_XP_NO_UPGRADES = O Upgrades esta desligado.
+ZP_XP_MENU_UPGRADES = Menu de Upgrades
+ZP_ITEM_UPGRADE_BUY = Comprar
+ZP_ITEM_UPGRADE_SELL = Vender
+ZP_UPGRADE_ITEM_NAME = Item: \r[%s]
+ZP_UPGRADE_ITEM_LEVEL = Level: \r[%d/%d]
+ZP_UPGRADE_ITEM_DESC = Descricao: \w%s
+ZP_XP_UPGRADE_MAX_BUY = Maximo de Upgrades Comprados
+ZP_NOT_HAVE_ENGOUT_XP = Voce nao tem XP Suficiente
+ZP_UPGRADE_BUY_SUCCESS = Voce Upou sua ^3[%s]^1 ao nivel ^3[%d]^1 com sucesso.
+ZP_XP_UPGRADE_MAX_SELL = Valor minimo do upgrade alcancado
+ZP_UPGRADE_SELL_SUCCESS = Voce Vendeu sua ^3[%s]^1 de nivel ^3[%d]^1 com sucesso.

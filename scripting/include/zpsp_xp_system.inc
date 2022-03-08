@@ -3,6 +3,8 @@
 #endif
 #define _zpsp_xp_system_included
 
+#define ZPSP_XP_INC_VERSION 1
+
 /**
  * Returns a users Experience.
  *
@@ -73,6 +75,12 @@ native zp_get_user_next_rank(id, buffer[], maxchars);
  */
 native zp_get_max_levels();
 
+// Description Cooming soon
+native zp_register_upgrade(const name[], const description[], const price[], const sell_value[], MaxLevel, const vaultname[], UseLang = 0);
+native zp_get_user_upgrade_lvl(index, upgrade_index);
+native zp_set_user_upgrade_lvl(index, upgrade_index, level);
+native zp_get_upgrade_max_lvl(upgrade_index);
+
 /**
  * Called when the client's level changes.
  *
@@ -81,7 +89,13 @@ native zp_get_max_levels();
  * @param levelup		True if the client gained a level or  xp, false if he lost one.
  * @noreturn
  */
-forward zp_user_level_change(id, level, xp)
+forward zp_user_level_change(id, level, xp);
+
+// Description Cooming soon
+forward zp_upgrade_buy_pre(id, upgrade_index);
+forward zp_upgrade_buy_post(id, upgrade_index);
+forward zp_upgrade_sell_pre(id, upgrade_index);
+forward zp_upgrade_sell_post(id, upgrade_index);
 
 
 	

@@ -1,0 +1,7 @@
+[en]
+UPGRADE_HEALTH_NAME = Health
+UPGRADE_HEALTH_DESC = More Health on Respawn
+
+[bp]
+UPGRADE_HEALTH_NAME = Vida
+UPGRADE_HEALTH_DESC = HP Extra durante o respawn
