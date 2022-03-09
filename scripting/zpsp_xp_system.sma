@@ -11,6 +11,17 @@
 	-> Changelog:
 		- Alpha (06/03/22): First release
 		- Alpha (08/03/22): Added Upgrade System
+		- 1.0: Official Release
+
+	-> Cvars:
+		- zp_xp_save_type "1" ; Save Data Type: (1 - Authid | 2 = Name | 3 = IP)
+		- zp_xp_for_kill "20" ; Xp For Kill Zombies/Humans
+		- zp_xp_for_kill_specials "30" ; Xp For Kill Zombies/Humans Specials
+		- zp_xp_infect "20" ; Xp For Infect Players
+		- zp_xp_damage_give "2" ; Xp for X damage
+		- zp_xp_damage_needed "750" ; Needed damage for give xp by damage
+		- zp_xp_vip_flag "b" ; Flag Acess to Bonus XP
+		- zp_xp_vip_bonus_xp "10" ; Bonus XP Amount
 
 	-> Credits:
 		Supremache: For original RankSystem
@@ -111,6 +122,7 @@ new const g_mPlayerData[][mData] = {
 
 // Defines/Conts
 #define GetRankName(%1) g_mPlayerData[g_iPlayerLevel[%1]][m_szRankName]
+#define MANAGE_ACESS ADMIN_ADMIN // Flag Y
 new const g_szLevelUp[] = { "vox/doop.wav" };
 
 // Forwards
@@ -120,6 +132,7 @@ enum {
 	FW_UPGRADE_BUY_POST,
 	FW_UPGRADE_SELL_PRE,
 	FW_UPGRADE_SELL_POST,
+	FW_UPGRADE_MENU_OPEN,
 	MAX_FORWARDS
 }
 new g_forwards[MAX_FORWARDS], g_ReturnResult
@@ -128,7 +141,7 @@ new g_forwards[MAX_FORWARDS], g_ReturnResult
 new g_iPlayerXP[33], g_iPlayerLevel[33], szPlayerAuthid[33][33], szPlayerName[33][33], szPlayerIP[33][33], g_iPlayerMenu[33], g_damagedealt[33]
 new cvar_savetype, cvar_xp_kill, cvar_xp_kill_specials, cvar_xp_infect, cvar_vip_bonus_xp, cvar_vip_bonus_flag, cvar_xp_damage_give, cvar_xp_damage_needed;
 new Array:g_ItemLevel, Array:g_ZombieClassLevel, Array:g_HumanClassLevel, Array:g_WpnPrimaryLevel, Array:g_WpnSecondaryLevel
-new g_SaveType, g_VipFlag, g_HudSync
+new g_SaveType, g_VipFlag, g_HudSync, g_AdditionalText[32], g_AdditionalNote[250];
 new Array:g_UpgradeName, Array:g_UpgradeDesc, Array:g_UpgradePriceHandler, Array:g_UpgradeSellHandler, Array:g_UpgradeMaxLevel, Array:g_UpgradeUseLang, Array:g_UpgradeVaultName, Array:g_PlayerUpgradeLevel[33], g_UpgradeCount
 
 // Plugin Initializing
@@ -158,12 +171,12 @@ public plugin_init() {
 	// Register Client Commands
 	register_say_cmd("upgrade", "MenuUpgrades")
 	register_say_cmd("upgrades", "MenuUpgrades")
-	register_say_cmd("xp", "MenuUpgrades")
+	register_say_cmd("xp", "MainMenu")
 	register_say_cmd("xplist", "ListXPs")
-	register_say_cmd("resetdata", "ResetData", ADMIN_RCON)
-	register_say_cmd("manage", "ManageData", ADMIN_RCON)
-	register_concmd("amx_setlvl", "SetLevels", ADMIN_RCON, " <player> <quantity>");
-	register_concmd("amx_givexp", "GiveEXP", ADMIN_RCON, " <player> <quantity>");
+	register_say_cmd("resetdata", "ResetData", MANAGE_ACESS)
+	register_say_cmd("manage", "ManageData", MANAGE_ACESS)
+	register_concmd("amx_setlvl", "SetLevels", MANAGE_ACESS, " <player> <quantity>");
+	register_concmd("amx_givexp", "GiveEXP", MANAGE_ACESS, " <player> <quantity>");
 		
 	// Forward
 	g_forwards[FW_LEVEL_UP] = CreateMultiForward("zp_user_level_change", ET_IGNORE, FP_CELL, FP_CELL, FP_CELL);
@@ -171,6 +184,7 @@ public plugin_init() {
 	g_forwards[FW_UPGRADE_BUY_POST] = CreateMultiForward("zp_upgrade_buy_post", ET_IGNORE, FP_CELL, FP_CELL);
 	g_forwards[FW_UPGRADE_SELL_PRE] = CreateMultiForward("zp_upgrade_sell_pre", ET_CONTINUE, FP_CELL, FP_CELL);
 	g_forwards[FW_UPGRADE_SELL_POST] = CreateMultiForward("zp_upgrade_sell_post", ET_IGNORE, FP_CELL, FP_CELL);
+	g_forwards[FW_UPGRADE_MENU_OPEN] = CreateMultiForward("zp_upgrade_menu_open", ET_IGNORE, FP_CELL, FP_CELL);
 
 	// Hud Sync
 	g_HudSync = CreateHudSyncObj();
@@ -221,6 +235,8 @@ public plugin_natives() {
 	register_native("zp_get_user_upgrade_lvl", "_get_user_upgrade_lvl")
 	register_native("zp_set_user_upgrade_lvl", "_set_user_upgrade_lvl")
 	register_native("zp_get_upgrade_max_lvl", "_get_upgrade_max_lvl")
+	register_native("zp_upgrade_add_text", "_add_text")
+	register_native("zp_upgrade_menu_add_note", "_add_note")
 }
 
 // Native: zp_get_user_xp
@@ -351,6 +367,16 @@ public _get_upgrade_max_lvl(plugin_id, num_params) {
 	return (ArrayGetCell(g_UpgradeMaxLevel, upgrade_index));
 }
 
+public _add_text(plugin_id, num_params) {
+	new Text[32]; get_string(1, Text, charsmax(Text))
+	strcat(g_AdditionalText, Text, charsmax(g_AdditionalText))
+}
+
+public _add_note(plugin_id, num_params) {
+	new Note[250]; get_string(1, Note, charsmax(Note))
+	strcat(g_AdditionalNote, fmt("%L: %s^n", LANG_PLAYER, "ZP_MENU_NOTE", Note), charsmax(g_AdditionalNote))
+}
+
 /*--------------------------------*
 * Client Info *
 *--------------------------------*/
@@ -438,12 +464,53 @@ public zp_player_show_hud(id, target, SpHudType:hudtype) {
 	else if(hudtype == HUD_CLASSIC)
 		zp_add_hud_text(fmt("- %L: %s - %L: %i/%i - %L: %i/%i", id, "ZP_RANK", GetRankName(id), id, "ZP_XP", g_iPlayerXP[id], xpnext, id, "ZP_LEVEL", g_iPlayerLevel[id], MAXLEVEL))
 }
+/*---------------*
+* Main Menu *
+*----------------*/
+public MainMenu(id) {
+	if(!is_user_connected(id))
+		return;
+
+	static iMenu;
+	iMenu = menu_create(fmt("%L %L", id, "ZP_XP_MENU_PREFIX", id, "ZP_XP_MAIN_MENU"), "MainMenuHandler")
+
+	menu_additem(iMenu, fmt("\w%L", id, "MENU_ITEM_UPGRADES"), "1")
+	menu_additem(iMenu, fmt("\w%L", id, "ZP_XP_MENU_LIST"), "2")
+
+	if(get_user_flags(id) & MANAGE_ACESS) {
+		menu_additem(iMenu, fmt("\w%L", id, "ZP_XP_MENU_MANAGE"), "3")
+		menu_additem(iMenu, fmt("\w%L", id, "ZP_XP_MENU_RESET"), "4")
+	}
+	
+	menu_setprop(iMenu, MPROP_EXITNAME, fmt("%L", id, "ZP_XP_MENU_EXIT"))
+	menu_display(id, iMenu)
+}
+
+public MainMenuHandler(id, iMenu, iItem) {
+	if(iItem != MENU_EXIT) {
+		new iAccess, iCallback, iData[6], iName[64], key;
+		menu_item_getinfo(iMenu, iItem, iAccess, iData, charsmax(iData), iName, charsmax(iName), iCallback);
+	
+		key = str_to_num(iData);
+		switch(key) {
+			case 1: MenuUpgrades(id);
+			case 2: ListXPs(id);
+			case 3: ManageData(id);
+			case 4: ResetData(id);
+		}
+	}
+	menu_destroy(iMenu)
+	return PLUGIN_HANDLED
+}
 
 /*---------------*
 * Upgrades *
 *----------------*/
 new upgradeChoosed[33]
 public MenuUpgrades(id) {
+	if(!is_user_connected(id))
+		return PLUGIN_CONTINUE;
+
 	if(!g_UpgradeCount) {
 		client_print_color(id, print_team_default, "%L %L", id, "ZP_XP_PREFIX", id, "ZP_XP_NO_UPGRADES");
 		return PLUGIN_HANDLED
@@ -479,11 +546,21 @@ public MenuUpgradesHandler(id, iMenu, iItem) {
 }
 
 public MenuBuyUpgrade(id) {
+	if(!is_user_connected(id))
+		return;
 
 	new szText[300], Up_Index;
 	szText = "";
 
 	Up_Index = upgradeChoosed[id];
+
+	g_AdditionalNote = ""
+	ExecuteForward(g_forwards[FW_UPGRADE_MENU_OPEN], g_ReturnResult, id, Up_Index)
+
+	if(g_ReturnResult >= ZP_PLUGIN_HANDLED) {
+		MenuUpgrades(id);
+		return
+	}
 
 	new UpgradeName[32], Value, CurrentLevel, MaxLvl, Array:Arr_Value, Description[250], iMenu
 
@@ -501,33 +578,36 @@ public MenuBuyUpgrade(id) {
 	strcat(szText, fmt("\w%L^n", id, "ZP_UPGRADE_ITEM_NAME", UpgradeName), charsmax(szText))
 	strcat(szText, fmt("\w%L^n", id, "ZP_UPGRADE_ITEM_LEVEL", CurrentLevel, MaxLvl), charsmax(szText))
 	strcat(szText, fmt("\w%L^n^n", id, "ZP_UPGRADE_ITEM_DESC", Description), charsmax(szText))
+	strcat(szText, fmt("\w%s\w^n", g_AdditionalNote), charsmax(szText))
 	iMenu = menu_create(szText, "MenuBuyUpgradeHandler")
 	
+	g_AdditionalText = ""
 	ExecuteForward(g_forwards[FW_UPGRADE_BUY_PRE], g_ReturnResult, id, Up_Index)
 	if(CurrentLevel < MaxLvl) {
 		Arr_Value = ArrayGetCell(g_UpgradePriceHandler, Up_Index)
 		Value = ArrayGetCell(Arr_Value, CurrentLevel)
 		
 		if(g_ReturnResult >= ZP_PLUGIN_HANDLED || g_iPlayerXP[id] < Value)
-			menu_additem(iMenu, fmt("\d%L \r[%d %L]", id, "ZP_ITEM_UPGRADE_BUY", Value, id, "ZP_XP"), "1", (1<<50))
+			menu_additem(iMenu, fmt("\d%L \r[%d %L] %s", id, "ZP_ITEM_UPGRADE_BUY", Value, id, "ZP_XP", g_AdditionalText), "1", (1<<50))
 		else 
-			menu_additem(iMenu, fmt("\w%L \y[%d %L]", id, "ZP_ITEM_UPGRADE_BUY", Value, id, "ZP_XP"), "1")
+			menu_additem(iMenu, fmt("\w%L \y[%d %L] %s", id, "ZP_ITEM_UPGRADE_BUY", Value, id, "ZP_XP", g_AdditionalText), "1")
 	}
 	else
-		menu_additem(iMenu, fmt("\d%L \y[MAX]", id, "ZP_ITEM_UPGRADE_BUY", Value), "1")
+		menu_additem(iMenu, fmt("\d%L \y[%L] %s", id, "ZP_ITEM_UPGRADE_BUY", id, "ZP_UPGRADE_MAX", g_AdditionalText), "1")
 
+	g_AdditionalText = ""
 	ExecuteForward(g_forwards[FW_UPGRADE_SELL_PRE], g_ReturnResult, id, Up_Index)
 	if(CurrentLevel > 0) {
 		Arr_Value = ArrayGetCell(g_UpgradeSellHandler, Up_Index)
 		Value = ArrayGetCell(Arr_Value, CurrentLevel-1)
 		
 		if(g_ReturnResult >= ZP_PLUGIN_HANDLED)
-			menu_additem(iMenu, fmt("\d%L \r[%d %L]", id, "ZP_ITEM_UPGRADE_SELL", Value, id, "ZP_XP"), "2", (1<<50))
+			menu_additem(iMenu, fmt("\d%L \r[%d %L] %s", id, "ZP_ITEM_UPGRADE_SELL", Value, id, "ZP_XP", g_AdditionalText), "2", (1<<50))
 		else 
-			menu_additem(iMenu, fmt("\w%L \y[%d %L]", id, "ZP_ITEM_UPGRADE_SELL", Value, id, "ZP_XP"), "2")
+			menu_additem(iMenu, fmt("\w%L \y[%d %L] %s", id, "ZP_ITEM_UPGRADE_SELL", Value, id, "ZP_XP", g_AdditionalText), "2")
 	}
 	else
-		menu_additem(iMenu, fmt("\d%L \y[MIN]", id, "ZP_ITEM_UPGRADE_SELL", Value), "2", (1<<50))
+		menu_additem(iMenu, fmt("\d%L \y[%L] %s", id, "ZP_ITEM_UPGRADE_SELL", id, "ZP_UPGRADE_MIN", g_AdditionalText), "2", (1<<50))
 
 	menu_setprop(iMenu, MPROP_BACKNAME, fmt("%L", id, "ZP_XP_MENU_BACK"))
 	menu_setprop(iMenu, MPROP_NEXTNAME, fmt("%L", id, "ZP_XP_MENU_NEXT"))
@@ -538,6 +618,7 @@ public MenuBuyUpgrade(id) {
 
 public MenuBuyUpgradeHandler(id, iMenu, iItem) {
 	if(iItem == MENU_EXIT) {
+		MenuUpgrades(id);
 		menu_destroy(iMenu)
 		return PLUGIN_HANDLED
 	}
@@ -607,7 +688,7 @@ public MenuBuyUpgradeHandler(id, iMenu, iItem) {
 
 		client_print_color(id, print_team_default, "%L %L", id, "ZP_XP_PREFIX", id, "ZP_UPGRADE_SELL_SUCCESS", UpgradeName, CurrentLevel-1);
 	}
-	SaveUpgrades(id);
+	SaveUpgrades(id, Up_Index);
 	MenuBuyUpgrade(id);
 	menu_destroy(iMenu)
 	return PLUGIN_HANDLED
@@ -622,15 +703,18 @@ public ListXPs(id) {
 }
 public ResetData(id) {
 	g_iPlayerMenu[id] = 2
-	PlayerRank(id, ADMIN_RCON)
+	PlayerRank(id, MANAGE_ACESS)
 }
 
 public ManageData(id) {
 	g_iPlayerMenu[id] = 3
-	PlayerRank(id, ADMIN_RCON)
+	PlayerRank(id, MANAGE_ACESS)
 }
 
 public PlayerRank(id, iFlag) {
+	if(!is_user_connected(id))
+		return PLUGIN_CONTINUE;
+
 	if(!access(id, iFlag)) {
 		client_print_color(id, print_team_default, "%L %L", id, "ZP_XP_PREFIX", id, "ZP_XP_NOACESS");
 		return PLUGIN_HANDLED
@@ -692,7 +776,27 @@ public ResetPlayerRank(id, iPlayer) {
 	
 	g_iPlayerXP[iPlayer] = 0
 	g_iPlayerLevel[iPlayer] = 0
-	
+
+	new szKey[64], VaultName[32];
+
+	switch(g_SaveType) {
+		case 2: 
+			formatex(szKey, charsmax(szKey), "%s-NAME", szPlayerName[iPlayer])
+		case 3: 
+			formatex(szKey, charsmax(szKey), "%s-IP", szPlayerIP[iPlayer])
+		default: 
+			formatex(szKey, charsmax(szKey), "%s-ID", szPlayerAuthid[iPlayer])
+	}
+
+	fvault_remove_key(VAULT_NAME, szKey) // Remove XP info
+
+	// Reset Upgrades
+	for(new i = 0; i < g_UpgradeCount; i++) {
+		ArraySetCell(g_PlayerUpgradeLevel[iPlayer], i, 0) 
+		ArrayGetString(g_UpgradeVaultName, i, VaultName, charsmax(VaultName))
+		fvault_remove_key(VaultName, szKey)
+	}
+
 	Log("%L", LANG_SERVER, "ZP_XP_ADM_RESET_LOG", szPlayerName[id], szPlayerAuthid[id], szPlayerName[iPlayer], szPlayerAuthid[iPlayer]);
 	client_print_color(0, print_team_default, "%L", LANG_PLAYER, "ZP_XP_ADM_RESET", szPlayerName[id], szPlayerName[iPlayer]);
 	
@@ -701,6 +805,9 @@ public ResetPlayerRank(id, iPlayer) {
 }
 
 public ManagePlayerRank(id, iPlayer) {
+	if(!is_user_connected(id))
+		return;
+
 	new szTitle[128], iMenu;
 	formatex(szTitle, charsmax(szTitle), "%L %L", id, "ZP_XP_MENU_PREFIX", id, "ZP_XP_MENU_MANAGE")
 	
@@ -873,7 +980,6 @@ public zp_user_humanized_post(victim, classid, attacker) {
 	AddXP(attacker, get_pcvar_num(cvar_xp_infect))
 }
 
-
 /*---------------*
 * Check Levels *
 *----------------*/
@@ -911,7 +1017,7 @@ stock SaveData(id) {
 	fvault_set_data(VAULT_NAME, szKey, szData)
 }
 
-stock SaveUpgrades(id) {
+stock SaveUpgrades(id, Up_Index) {
 	new szKey[64], CurrentLevel, VaultName[32]
 	switch(g_SaveType) {
 		case 2: 
@@ -922,11 +1028,9 @@ stock SaveUpgrades(id) {
 			formatex(szKey, charsmax(szKey), "%s-ID", szPlayerAuthid[id])
 	}
 
-	for(new i = 0; i < g_UpgradeCount; i++) {
-		CurrentLevel = ArrayGetCell(g_PlayerUpgradeLevel[id], i)
-		ArrayGetString(g_UpgradeVaultName, i, VaultName, charsmax(VaultName))
-		fvault_set_data(VaultName, szKey, fmt("%d", CurrentLevel))
-	}
+	CurrentLevel = ArrayGetCell(g_PlayerUpgradeLevel[id], Up_Index)
+	ArrayGetString(g_UpgradeVaultName, Up_Index, VaultName, charsmax(VaultName))
+	fvault_set_data(VaultName, szKey, fmt("%d", CurrentLevel))
 }
 
 stock LoadData(id) {

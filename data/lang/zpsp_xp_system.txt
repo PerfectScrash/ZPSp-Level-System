@@ -20,9 +20,15 @@ ZP_XP_ADM_SET_LVL_LOG = *ADMIN* %s <%s>: set [%s] <%s> to level [%d] (Rank: %s)
 ZP_XP_ADM_RESET_LOG = *ADMIN* %s <%s>: reset rank data of [%s] <%s>
 
 ZP_XP_MENU_PREFIX = \y[ZPSp XP]\w
+ZP_XP_MAIN_MENU = Main Menu
 ZP_XP_MENU_RESET = Reset Data
 ZP_XP_MENU_MANAGE = Manage Players
 ZP_XP_MENU_LIST = XP List
+MENU_ITEM_UPGRADES = Upgrades
+ZP_MENU_NOTE = Note
+
+ZP_UPGRADE_MAX = MAX
+ZP_UPGRADE_MIN = MIN
 
 ZP_XP_MENU_BACK = Back
 ZP_XP_MENU_NEXT = Next
@@ -66,6 +72,16 @@ ZP_XP_MENU_PREFIX = \y[ZPSp XP]\w
 ZP_XP_MENU_RESET = Resetar dados
 ZP_XP_MENU_MANAGE = Gerenciar niveis
 ZP_XP_MENU_LIST = Lista de XP
+
+ZP_XP_MAIN_MENU = Menu Principal
+MENU_ITEM_UPGRADES = Upgrades
+MENU_ITEM_RANK_LIST = Lista de Ranks
+MENU_ITEM_MANAGE_DATA = Gerenciar XP dos jogadores
+MENU_ITEM_RESET_PL_DATA = Resetar Dados dos jogadores
+ZP_MENU_NOTE = OBS
+
+ZP_UPGRADE_MAX = Maximo
+ZP_UPGRADE_MIN = Minimo
 
 ZP_XP_MENU_BACK = Voltar
 ZP_XP_MENU_NEXT = Proximo

@@ -3,7 +3,7 @@
 #endif
 #define _zpsp_xp_system_included
 
-#define ZPSP_XP_INC_VERSION 1
+#define ZPSP_XP_INC_VERSION 2
 
 /**
  * Returns a users Experience.
@@ -80,6 +80,8 @@ native zp_register_upgrade(const name[], const description[], const price[], con
 native zp_get_user_upgrade_lvl(index, upgrade_index);
 native zp_set_user_upgrade_lvl(index, upgrade_index, level);
 native zp_get_upgrade_max_lvl(upgrade_index);
+native zp_upgrade_add_text(const text[]);
+native zp_upgrade_menu_add_note(const note[]);
 
 /**
  * Called when the client's level changes.
@@ -96,6 +98,4 @@ forward zp_upgrade_buy_pre(id, upgrade_index);
 forward zp_upgrade_buy_post(id, upgrade_index);
 forward zp_upgrade_sell_pre(id, upgrade_index);
 forward zp_upgrade_sell_post(id, upgrade_index);
-
-
-	
+forward zp_upgrade_menu_open(id, upgrade_index);

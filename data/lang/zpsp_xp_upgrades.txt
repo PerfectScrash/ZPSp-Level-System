@@ -1,7 +1,21 @@
 [en]
-UPGRADE_HEALTH_NAME = Health
+UPGRADE_HEALTH_NAME_H = Health \y[Human]
+UPGRADE_HEALTH_NAME_Z = Health \r[Zombie]
 UPGRADE_HEALTH_DESC = More Health on Respawn
+UPGRADE_HEALTH_NOTE = Your health are \y%d%%\w Higher
+
+UPGRADE_GRAVITY_NAME_H = Gravity \y[Human]
+UPGRADE_GRAVITY_NAME_Z = Gravity \r[Zombie]
+UPGRADE_GRAVITY_DESC = Low Gravity \d(High Jump)
+UPGRADE_GRAVITY_NOTE = Your Gravity are \y%d%%\w low
 
 [bp]
-UPGRADE_HEALTH_NAME = Vida
+UPGRADE_HEALTH_NAME_H = Vida \y[Humano]
+UPGRADE_HEALTH_NAME_Z = Vida \r[Zombie]
 UPGRADE_HEALTH_DESC = HP Extra durante o respawn
+UPGRADE_HEALTH_NOTE = Seu HP esta \y%d%%\w Maior
+
+UPGRADE_GRAVITY_NAME_H = Gravidade \y[Humano]
+UPGRADE_GRAVITY_NAME_Z = Gravidade \r[Zombie]
+UPGRADE_GRAVITY_DESC = Baixa Gravidade \d(Pulo mais alto)
+UPGRADE_GRAVITY_NOTE = Sua Gravidade esta \y%d%%\w menor
