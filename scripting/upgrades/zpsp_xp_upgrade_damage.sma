@@ -34,7 +34,9 @@ public plugin_init() {
 	register_plugin("[ZPSp] XP Upgrade: Damage", "1.0", "Perf. Scrash")
 	register_dictionary("zpsp_xp_upgrades.txt")
 
-	RegisterHam(Ham_TakeDamage, "player", "fw_TakeDamage")
+	RegisterHam(Ham_TakeDamage, "player", "fw_TakeDamage") // More Damage on players
+	RegisterHam(Ham_TakeDamage, "func_breakable", "fw_TakeDamage") // More damage on breakable objects
+	RegisterHam(Ham_TakeDamage, "info_target", "fw_TakeDamage") // More damage on boss entitities
 
 	g_UpgradeId = zp_register_upgrade(up_name, up_description, up_prices, up_sell_values, up_max_level, up_vault_name, 1);
 }

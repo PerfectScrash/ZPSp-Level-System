@@ -13,6 +13,18 @@ UPGRADE_DAMAGE_NAME = Attack Damage \y[Human]
 UPGRADE_DAMAGE_DESC = More attack damage on weapons
 UPGRADE_DAMAGE_NOTE = Your damage \y%d%%\w higher
 
+UPGRADE_PROTECTION_NAME = Protection \y[Human]
+UPGRADE_PROTECTION_DESC = Low damage recive
+UPGRADE_PROTECTION_NOTE = Your Protection against bullets are in \y%d%%
+
+UPGRADE_GRENADE_NAME = Grenade \y[Human]
+UPGRADE_GRENADE_DESC = Receive some grenade after a period according to the upgrade level
+UPGRADE_GRENADE_NOTE = Time to receive the grenade is \y%d Seconds
+
+UPGRADE_AMMO_NAME = Ammo \y[Human]
+UPGRADE_AMMO_DESC = Recive one clip in few seconds.
+UPGRADE_AMMO_NOTE = Time to recive clip is \y%d segundos
+
 [bp]
 UPGRADE_HEALTH_NAME_H = Vida \y[Humano]
 UPGRADE_HEALTH_NAME_Z = Vida \r[Zombie]
@@ -27,3 +39,15 @@ UPGRADE_GRAVITY_NOTE = Sua Gravidade esta \y%d%%\w menor
 UPGRADE_DAMAGE_NAME = Dano \y[Humano]
 UPGRADE_DAMAGE_DESC = Maior dano nas armas
 UPGRADE_DAMAGE_NOTE = Seu dano esta \y%d%%\w maior
+
+UPGRADE_PROTECTION_NAME = Proteção \r[Zombie]
+UPGRADE_PROTECTION_DESC = Recebe menos dano das armas
+UPGRADE_PROTECTION_NOTE = Sua proteção contra disparos esta \y%d%%
+
+UPGRADE_GRENADE_NAME = Granada \y[Humano]
+UPGRADE_GRENADE_DESC = Recebe alguma granada após um periodo de acordo com o nivel do upgrade
+UPGRADE_GRENADE_NOTE = Tempo para receber a granada é de \y%d Segundos
+
+UPGRADE_AMMO_NAME = Munição \y[Humano]
+UPGRADE_AMMO_DESC = Recebe uma bala em segundos.
+UPGRADE_AMMO_NOTE = Tempo para receber uma bala é de \y%d segundos
