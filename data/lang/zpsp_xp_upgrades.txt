@@ -9,6 +9,10 @@ UPGRADE_GRAVITY_NAME_Z = Gravity \r[Zombie]
 UPGRADE_GRAVITY_DESC = Low Gravity \d(High Jump)
 UPGRADE_GRAVITY_NOTE = Your Gravity are \y%d%%\w low
 
+UPGRADE_DAMAGE_NAME = Attack Damage \y[Human]
+UPGRADE_DAMAGE_DESC = More attack damage on weapons
+UPGRADE_DAMAGE_NOTE = Your damage \y%d%%\w higher
+
 [bp]
 UPGRADE_HEALTH_NAME_H = Vida \y[Humano]
 UPGRADE_HEALTH_NAME_Z = Vida \r[Zombie]
@@ -19,3 +23,7 @@ UPGRADE_GRAVITY_NAME_H = Gravidade \y[Humano]
 UPGRADE_GRAVITY_NAME_Z = Gravidade \r[Zombie]
 UPGRADE_GRAVITY_DESC = Baixa Gravidade \d(Pulo mais alto)
 UPGRADE_GRAVITY_NOTE = Sua Gravidade esta \y%d%%\w menor
+
+UPGRADE_DAMAGE_NAME = Dano \y[Humano]
+UPGRADE_DAMAGE_DESC = Maior dano nas armas
+UPGRADE_DAMAGE_NOTE = Seu dano esta \y%d%%\w maior

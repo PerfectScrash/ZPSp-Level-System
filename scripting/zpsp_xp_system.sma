@@ -1071,7 +1071,6 @@ stock LoadData(id) {
 			Level = 0
 	
 		ArraySetCell(g_PlayerUpgradeLevel[id], i, Level)
-		log_amx("Teste ID %d: Valor: %d", id, ArrayGetCell(g_PlayerUpgradeLevel[id], i))
 	}
 }
 
