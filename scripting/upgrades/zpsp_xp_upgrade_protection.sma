@@ -1,8 +1,8 @@
 /*============================================
-		[ZPSp] XP Upgrade: Protection H/Z
+		[ZPSp] XP Upgrade: Protection
 
 		* Description:
-			- More protection when upgrade
+			- Reduces damage taken
 
 		* Changelog:
 			- 1.0: First Release
@@ -25,7 +25,7 @@ new const Float:Protection_Percent[up_max_level] = {
 	0.9,	// Level 1
 	0.85,	// Level 2
 	0.8,	// Level 3
-	0.85,	// Level 4
+	0.75,	// Level 4
 	0.7		// Level 5
 }
 
@@ -34,12 +34,12 @@ public plugin_init() {
 	register_plugin("[ZPSp] XP Upgrade: Protection", "1.0", "Perf. Scrash")
 	register_dictionary("zpsp_xp_upgrades.txt")
 
-	RegisterHam(Ham_TakeDamage, "player", "fw_TakeDamage") // More Protection on players
+	RegisterHam(Ham_TakeDamage, "player", "fw_TakeDamage") // Take damage forward
 
 	g_UpgradeId = zp_register_upgrade(up_name, up_description, up_prices, up_sell_values, up_max_level, up_vault_name, 1);
 }
 
-public fw_TakeDamage(victim, inflictor, attacker, Float:protection, protection_type) { // Ham Take Protection Forward
+public fw_TakeDamage(victim, inflictor, attacker, Float:damage, damage_type) { // Ham Take Damage Forward
 	if(!is_user_alive(victim))
 		return HAM_IGNORED;
 
@@ -48,7 +48,7 @@ public fw_TakeDamage(victim, inflictor, attacker, Float:protection, protection_t
 
 	static level; level = zp_get_user_upgrade_lvl(victim, g_UpgradeId)
 	if(level)
-		SetHamParamFloat(4, protection * Protection_Percent[level-1])
+		SetHamParamFloat(4, damage * Protection_Percent[level-1])
 	
 	return HAM_IGNORED;
 }
@@ -58,6 +58,6 @@ public zp_upgrade_menu_open(id, Up_id) {
 	if(Up_id == g_UpgradeId) {
 		level = zp_get_user_upgrade_lvl(id, Up_id)
 		if(level)
-			zp_upgrade_menu_add_note(fmt("%L", id, "UPGRADE_PROTECTION_NOTE", floatround((Protection_Percent[level-1] * 100) - 100)))
+			zp_upgrade_menu_add_note(fmt("%L", id, "UPGRADE_PROTECTION_NOTE", floatround(100 - (Protection_Percent[level-1] * 100))))
 	}	
 }

@@ -40,9 +40,15 @@
 new const ZPSP_XP_CFG_FILE[] = "zpsp_configs/zpsp_xp_system.cfg" // Config file
 new const VAULT_NAME[] = "zpsp_xp_system" // Vault File
 
+// Defines/Conts
+#define GetRankName(%1) g_mPlayerData[g_iPlayerLevel[%1]][m_szRankName]
+#define MANAGE_ACESS ADMIN_ADMIN // Flag Y
+new const g_szLevelUp[] = { "vox/doop.wav" };
+#define MAX_BUFFER_STRING 250
+
 // Enums
-enum _:eCommandSettings { iMenuType, iCommands[32], iFlags };
-enum _:mData { m_szRankName[32], m_iRankXP };
+enum _:eCommandSettings { iMenuType, iCommands[MAX_BUFFER_STRING], iFlags };
+enum _:mData { m_szRankName[MAX_BUFFER_STRING], m_iRankXP };
 
 // XP manager
 #define MAXLEVEL (sizeof(g_mPlayerData)-1) // Dont Change
@@ -120,11 +126,6 @@ new const g_mPlayerData[][mData] = {
 	{ "Unstoppable", 1950000 }
 };
 
-// Defines/Conts
-#define GetRankName(%1) g_mPlayerData[g_iPlayerLevel[%1]][m_szRankName]
-#define MANAGE_ACESS ADMIN_ADMIN // Flag Y
-new const g_szLevelUp[] = { "vox/doop.wav" };
-
 // Forwards
 enum {
 	FW_LEVEL_UP = 0,
@@ -141,7 +142,7 @@ new g_forwards[MAX_FORWARDS], g_ReturnResult
 new g_iPlayerXP[33], g_iPlayerLevel[33], szPlayerAuthid[33][33], szPlayerName[33][33], szPlayerIP[33][33], g_iPlayerMenu[33], g_damagedealt[33]
 new cvar_savetype, cvar_xp_kill, cvar_xp_kill_specials, cvar_xp_infect, cvar_vip_bonus_xp, cvar_vip_bonus_flag, cvar_xp_damage_give, cvar_xp_damage_needed;
 new Array:g_ItemLevel, Array:g_ZombieClassLevel, Array:g_HumanClassLevel, Array:g_WpnPrimaryLevel, Array:g_WpnSecondaryLevel
-new g_SaveType, g_VipFlag, g_HudSync, g_AdditionalText[32], g_AdditionalNote[250];
+new g_SaveType, g_VipFlag, g_HudSync, g_AdditionalText[MAX_BUFFER_STRING], g_AdditionalNote[250];
 new Array:g_UpgradeName, Array:g_UpgradeDesc, Array:g_UpgradePriceHandler, Array:g_UpgradeSellHandler, Array:g_UpgradeMaxLevel, Array:g_UpgradeUseLang, Array:g_UpgradeVaultName, Array:g_PlayerUpgradeLevel[33], g_UpgradeCount
 
 // Plugin Initializing
@@ -184,7 +185,7 @@ public plugin_init() {
 	g_forwards[FW_UPGRADE_BUY_POST] = CreateMultiForward("zp_upgrade_buy_post", ET_IGNORE, FP_CELL, FP_CELL);
 	g_forwards[FW_UPGRADE_SELL_PRE] = CreateMultiForward("zp_upgrade_sell_pre", ET_CONTINUE, FP_CELL, FP_CELL);
 	g_forwards[FW_UPGRADE_SELL_POST] = CreateMultiForward("zp_upgrade_sell_post", ET_IGNORE, FP_CELL, FP_CELL);
-	g_forwards[FW_UPGRADE_MENU_OPEN] = CreateMultiForward("zp_upgrade_menu_open", ET_IGNORE, FP_CELL, FP_CELL);
+	g_forwards[FW_UPGRADE_MENU_OPEN] = CreateMultiForward("zp_upgrade_menu_open", ET_CONTINUE, FP_CELL, FP_CELL);
 
 	// Hud Sync
 	g_HudSync = CreateHudSyncObj();
@@ -205,13 +206,13 @@ public plugin_cfg() {
 
 // Download Sound
 public plugin_precache() {
-	g_UpgradeName = ArrayCreate(32, 1)
-	g_UpgradeDesc = ArrayCreate(250, 1)
+	g_UpgradeName = ArrayCreate(MAX_BUFFER_STRING, 1)
+	g_UpgradeDesc = ArrayCreate(MAX_BUFFER_STRING, 1)
 	g_UpgradePriceHandler = ArrayCreate(1, 1)
 	g_UpgradeSellHandler = ArrayCreate(1, 1)
 	g_UpgradeMaxLevel = ArrayCreate(1, 1)
 	g_UpgradeUseLang = ArrayCreate(1, 1)
-	g_UpgradeVaultName = ArrayCreate(32, 1)
+	g_UpgradeVaultName = ArrayCreate(MAX_BUFFER_STRING, 1)
 
 	for(new i = 0; i <= MaxClients; i++)
 		g_PlayerUpgradeLevel[i] = ArrayCreate(1, 1)
@@ -285,7 +286,7 @@ public _get_max_levels(iPlugin, iParams)
 
 // native zp_register_upgrade(const name[], const description[], const price[], const sell_value[], MaxLevel, const vaultname[], UseLang = 0);
 public _register_upgrade(plugin_id, num_params) {
-	new name[32], Price[100], sell_value[100], MaxLevel, vaultname[32], UseLang, Description[250]
+	new name[MAX_BUFFER_STRING], Price[100], sell_value[100], MaxLevel, vaultname[MAX_BUFFER_STRING], UseLang, Description[MAX_BUFFER_STRING]
 
 	MaxLevel = get_param(5);
 	if(MaxLevel > 100 || MaxLevel < 1) {
@@ -368,12 +369,12 @@ public _get_upgrade_max_lvl(plugin_id, num_params) {
 }
 
 public _add_text(plugin_id, num_params) {
-	new Text[32]; get_string(1, Text, charsmax(Text))
+	new Text[MAX_BUFFER_STRING]; get_string(1, Text, charsmax(Text))
 	strcat(g_AdditionalText, Text, charsmax(g_AdditionalText))
 }
 
 public _add_note(plugin_id, num_params) {
-	new Note[250]; get_string(1, Note, charsmax(Note))
+	new Note[MAX_BUFFER_STRING]; get_string(1, Note, charsmax(Note))
 	strcat(g_AdditionalNote, fmt("%L: %s^n", LANG_PLAYER, "ZP_MENU_NOTE", Note), charsmax(g_AdditionalNote))
 }
 
@@ -516,7 +517,7 @@ public MenuUpgrades(id) {
 		return PLUGIN_HANDLED
 	}
 
-	new UpgradeName[32], i, iMenu;
+	new UpgradeName[MAX_BUFFER_STRING], i, iMenu;
 	iMenu = menu_create(fmt("%L %L", id, "ZP_XP_MENU_PREFIX", id, "ZP_XP_MENU_UPGRADES"), "MenuUpgradesHandler")
 	for(i = 0; i < g_UpgradeCount; i++) {		
 		ArrayGetString(g_UpgradeName, i, UpgradeName, charsmax(UpgradeName))
@@ -562,7 +563,7 @@ public MenuBuyUpgrade(id) {
 		return
 	}
 
-	new UpgradeName[32], Value, CurrentLevel, MaxLvl, Array:Arr_Value, Description[250], iMenu
+	new UpgradeName[MAX_BUFFER_STRING], Value, CurrentLevel, MaxLvl, Array:Arr_Value, Description[250], iMenu
 
 	ArrayGetString(g_UpgradeName, Up_Index, UpgradeName, charsmax(UpgradeName))
 	ArrayGetString(g_UpgradeDesc, Up_Index, Description, charsmax(Description))
@@ -626,7 +627,7 @@ public MenuBuyUpgradeHandler(id, iMenu, iItem) {
 	menu_item_getinfo(iMenu, iItem, iAccess, iData, charsmax(iData), iName, charsmax(iName), iCallback);
 	key = str_to_num(iData);
 
-	new UpgradeName[32], Value, CurrentLevel, MaxLvl, Array:Arr_Value;
+	new UpgradeName[MAX_BUFFER_STRING], Value, CurrentLevel, MaxLvl, Array:Arr_Value;
 	Up_Index = upgradeChoosed[id]
 
 	ArrayGetString(g_UpgradeName, Up_Index, UpgradeName, charsmax(UpgradeName))
@@ -689,6 +690,7 @@ public MenuBuyUpgradeHandler(id, iMenu, iItem) {
 		client_print_color(id, print_team_default, "%L %L", id, "ZP_XP_PREFIX", id, "ZP_UPGRADE_SELL_SUCCESS", UpgradeName, CurrentLevel-1);
 	}
 	SaveUpgrades(id, Up_Index);
+	CheckLevel(id)
 	MenuBuyUpgrade(id);
 	menu_destroy(iMenu)
 	return PLUGIN_HANDLED
@@ -777,7 +779,7 @@ public ResetPlayerRank(id, iPlayer) {
 	g_iPlayerXP[iPlayer] = 0
 	g_iPlayerLevel[iPlayer] = 0
 
-	new szKey[64], VaultName[32];
+	new szKey[64], VaultName[MAX_BUFFER_STRING];
 
 	switch(g_SaveType) {
 		case 2: 
@@ -1018,7 +1020,7 @@ stock SaveData(id) {
 }
 
 stock SaveUpgrades(id, Up_Index) {
-	new szKey[64], CurrentLevel, VaultName[32]
+	new szKey[64], CurrentLevel, VaultName[MAX_BUFFER_STRING]
 	switch(g_SaveType) {
 		case 2: 
 			formatex(szKey, charsmax(szKey), "%s-NAME", szPlayerName[id])
@@ -1053,7 +1055,7 @@ stock LoadData(id) {
 	g_iPlayerLevel[id] = str_to_num(szLevel)
 	g_iPlayerXP[id] = str_to_num(szXP)
 
-	new VaultName[32], MaxLevel, Level, szData2[10]
+	new VaultName[MAX_BUFFER_STRING], MaxLevel, Level, szData2[10]
 	for(new i = 0; i < g_UpgradeCount; i++) {
 		szData2[0] = 0
 
