@@ -23,8 +23,7 @@ new const up_prices[up_max_level] = { 100, 200, 300, 400, 500 }
 new const up_sell_values[up_max_level] = { 50, 100, 150, 200, 250 }
 new const up_vault_name[] = "zpsp_upgrade_precision"
 
-new const g_MaxClipAmmo[] = { 0, 13, 0, 10, 0, 7, 0, 30, 30, 0, 30, 20, 25, 30, 35, 25, 12, 20, 10, 30, 100, 8, 30, 30, 20, 0, 7, 30, 30, 0, 50 }
-new const wpnClass[][25] = { "", "weapon_p228", "", "weapon_scout", "", "weapon_xm1014", "", "weapon_mac10", "weapon_aug", "", "weapon_elite", "weapon_fiveseven", "weapon_ump45", 
+new const wpnClass[][] = { "", "weapon_p228", "", "weapon_scout", "", "weapon_xm1014", "", "weapon_mac10", "weapon_aug", "", "weapon_elite", "weapon_fiveseven", "weapon_ump45", 
 "weapon_sg550", "weapon_galil", "weapon_famas", "weapon_usp", "weapon_glock18", "weapon_awp", "weapon_mp5navy", "weapon_m249", "weapon_m3", "weapon_m4a1", 
 "weapon_tmp", "weapon_g3sg1", "", "weapon_deagle", "weapon_sg552", "weapon_ak47", "", "weapon_p90" }
 
@@ -41,9 +40,9 @@ public plugin_init() {
 	register_plugin("[ZPSp] XP Upgrade: Precision", "1.0", "Perf. Scrash")
 	register_dictionary("zpsp_xp_upgrades.txt")
 
-	for (new i = 0; i < sizeof g_MaxClipAmmo; i++)
+	for (new i = 0; i < sizeof wpnClass; i++)
 	{
-		if (g_MaxClipAmmo[i] <= 0)
+		if(!wpnClass[i][0])
 			continue;
 	
 		RegisterHam(Ham_Weapon_PrimaryAttack, wpnClass[i], "fw_PrimaryAttack")

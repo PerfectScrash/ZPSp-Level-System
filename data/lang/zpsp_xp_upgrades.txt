@@ -24,7 +24,7 @@ UPGRADE_PROTECTION_NOTE = Your Protection against bullets are in \y%d%%
 
 UPGRADE_KNOCKBACK_NAME = Knockback \r[Zombie]
 UPGRADE_KNOCKBACK_DESC = Reduces knockback taken
-UPGRADE_KNOCKBACK_NOTE = Your knockback are reduced in \y%d%%
+UPGRADE_KNOCKBACK_NOTE = Your knockback was reduced in \y%d%%
 
 UPGRADE_GRENADE_NAME = Grenade \y[Human]
 UPGRADE_GRENADE_DESC = Receive some grenade after a period according to the upgrade level
@@ -45,6 +45,11 @@ UPGRADE_DODGE_NOTE = Your chance of escaping a shot is \r1 \wout of \r%d.
 UPGRADE_ELSHOOT_NAME = Elemental Shoot \y[Human]
 UPGRADE_ELSHOOT_DESC = Chance of shooting fire or ice on enemies
 UPGRADE_ELSHOOT_NOTE = Your chance for shooting fire or ice is \r1 \wout of \r%d
+
+UPGRADE_RELOAD_NAME = Reload Time \y[Human]
+UPGRADE_RELOAD_DESC = Reduces reload time
+UPGRADE_RELOAD_NOTE = Your reload time was reduced in \y%d%%
+UPGRADE_RELOAD_NOTE2 = This upgrade don't affect some extra itens
 
 UPGRADE_PARACHUTE_NAME = Parachute \y[Human]
 UPGRADE_PARACHUTE_DESC = \r[E]\w for use the parachute
@@ -103,6 +108,11 @@ UPGRADE_DODGE_NOTE = Sua chance de escapar de algum tiro é de \r1 \wde \r%d
 UPGRADE_ELSHOOT_NAME = Elemental Shoot \y[Humano]
 UPGRADE_ELSHOOT_DESC = Chance de atirar fogo ou gelo nos inimigos
 UPGRADE_ELSHOOT_NOTE = Sua chance de atirar fogo ou gelo é de \r1 \wde \r%d
+
+UPGRADE_RELOAD_NAME = Tempo de recarga \y[Humano]
+UPGRADE_RELOAD_DESC = Reduz o tempo de recarga
+UPGRADE_RELOAD_NOTE = Seu tempo de recarga foi reduzido em \y%d%%
+UPGRADE_RELOAD_NOTE2 = Esse upgrade não afeta algumas armas dos itens extras
 
 UPGRADE_PARACHUTE_NAME = Paraquedas \y[Humano]
 UPGRADE_PARACHUTE_DESC = \r[E]\w Para Usar o paraquedas

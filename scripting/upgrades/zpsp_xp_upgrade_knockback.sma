@@ -2,7 +2,7 @@
 		[ZPSp] XP Upgrade: Knockback
 
 		* Description:
-			- Reduces damage taken
+			- Reduces knockback taken
 
 		* Changelog:
 			- 1.0: First Release
@@ -33,8 +33,6 @@ public plugin_init() {
 	register_plugin("[ZPSp] XP Upgrade: Knockback", "1.0", "Perf. Scrash")
 	register_dictionary("zpsp_xp_upgrades.txt")
 
-	register_clcmd("say /imp", "ver_imp")
-
 	g_UpgradeId = zp_register_upgrade(up_name, up_description, up_prices, up_sell_values, up_max_level, up_vault_name, 1);
 }
 
@@ -52,8 +50,6 @@ public set_knockback(id, reset) {
 		zp_set_user_knockback(id, zp_get_default_knockback(id) * Percent[level-1]);
 	else if(reset)
 		zp_reset_user_knockback(id);
-
-	client_print_color(id, print_team_grey, "^3Knock padrao: ^1%0.2f ^4||^3 Knock Atual: ^1%0.2f", zp_get_default_knockback(id), zp_get_user_knockback(id))
 }
 
 public zp_upgrade_menu_open(id, Up_id) {
@@ -64,6 +60,3 @@ public zp_upgrade_menu_open(id, Up_id) {
 			zp_upgrade_menu_add_note(fmt("%L", id, "UPGRADE_KNOCKBACK_NOTE", floatround(100 - (Percent[level-1] * 100))))
 	}	
 }
-
-public ver_imp(id)
-	client_print_color(id, print_team_grey, "^3Knock padrao: ^1%0.2f ^4||^3 Knock Atual: ^1%0.2f", zp_get_default_knockback(id), zp_get_user_knockback(id))
