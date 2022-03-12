@@ -139,10 +139,10 @@ enum {
 new g_forwards[MAX_FORWARDS], g_ReturnResult
 
 // Variables
-new g_iPlayerXP[33], g_iPlayerLevel[33], szPlayerAuthid[33][33], szPlayerName[33][33], szPlayerIP[33][33], g_iPlayerMenu[33], g_damagedealt[33]
+new g_iPlayerXP[33], g_iPlayerLevel[33], szPlayerAuthid[33][33], szPlayerName[33][33], szPlayerIP[33][33], g_iPlayerMenu[33], g_damagedealt[33], g_PageUpgrades[33]
 new cvar_savetype, cvar_xp_kill, cvar_xp_kill_specials, cvar_xp_infect, cvar_vip_bonus_xp, cvar_vip_bonus_flag, cvar_xp_damage_give, cvar_xp_damage_needed;
 new Array:g_ItemLevel, Array:g_ZombieClassLevel, Array:g_HumanClassLevel, Array:g_WpnPrimaryLevel, Array:g_WpnSecondaryLevel
-new g_SaveType, g_VipFlag, g_HudSync, g_AdditionalText[MAX_BUFFER_STRING], g_AdditionalNote[250];
+new g_SaveType, g_VipFlag, g_HudSync, g_AdditionalText[MAX_BUFFER_STRING], g_AdditionalNote[500];
 new Array:g_UpgradeName, Array:g_UpgradeDesc, Array:g_UpgradePriceHandler, Array:g_UpgradeSellHandler, Array:g_UpgradeMaxLevel, Array:g_UpgradeUseLang, Array:g_UpgradeVaultName, Array:g_PlayerUpgradeLevel[33], g_UpgradeCount
 
 // Plugin Initializing
@@ -375,7 +375,7 @@ public _add_text(plugin_id, num_params) {
 
 public _add_note(plugin_id, num_params) {
 	new Note[MAX_BUFFER_STRING]; get_string(1, Note, charsmax(Note))
-	strcat(g_AdditionalNote, fmt("%L: %s^n", LANG_PLAYER, "ZP_MENU_NOTE", Note), charsmax(g_AdditionalNote))
+	strcat(g_AdditionalNote, fmt("\w%L: %s^n", LANG_PLAYER, "ZP_MENU_NOTE", Note), charsmax(g_AdditionalNote))
 }
 
 /*--------------------------------*
@@ -397,6 +397,7 @@ public client_disconnected(id) {
 	g_damagedealt[id] = 0
 	g_iPlayerXP[id] = 0
 	g_iPlayerLevel[id] = 0
+	g_PageUpgrades[id] = 0
 }
 
 public client_infochanged(id) {
@@ -530,11 +531,19 @@ public MenuUpgrades(id) {
 	menu_setprop(iMenu, MPROP_NEXTNAME, fmt("%L", id, "ZP_XP_MENU_NEXT"))
 	menu_setprop(iMenu, MPROP_EXITNAME, fmt("%L", id, "ZP_XP_MENU_EXIT"))
 
-	menu_display(id, iMenu)
+	g_PageUpgrades[id] = min(g_PageUpgrades[id], menu_pages(iMenu)-1)
+	menu_display(id, iMenu, g_PageUpgrades[id])
 	return PLUGIN_HANDLED
 }
 
 public MenuUpgradesHandler(id, iMenu, iItem) {
+	if(!is_user_connected(id)) {
+		menu_destroy(iMenu)
+		return PLUGIN_HANDLED
+	}
+
+	static menudummy; player_menu_info(id, menudummy, menudummy, g_PageUpgrades[id])
+
 	if(iItem != MENU_EXIT) {
 		new iAccess, iCallback, iData[6], iName[64];
 		menu_item_getinfo(iMenu, iItem, iAccess, iData, charsmax(iData), iName, charsmax(iName), iCallback);
@@ -550,7 +559,7 @@ public MenuBuyUpgrade(id) {
 	if(!is_user_connected(id))
 		return;
 
-	new szText[300], Up_Index;
+	new szText[500], Up_Index;
 	szText = "";
 
 	Up_Index = upgradeChoosed[id];
@@ -618,6 +627,11 @@ public MenuBuyUpgrade(id) {
 }
 
 public MenuBuyUpgradeHandler(id, iMenu, iItem) {
+	if(!is_user_connected(id)) {
+		menu_destroy(iMenu)
+		return PLUGIN_HANDLED
+	}
+
 	if(iItem == MENU_EXIT) {
 		MenuUpgrades(id);
 		menu_destroy(iMenu)
@@ -755,7 +769,7 @@ public sort_players_by_xp(id1, id2) {
 }
 
 public Handler(id, iMenu, iItem) {
-	if(iItem != MENU_EXIT) {
+	if(iItem != MENU_EXIT && is_user_connected(id)) {
 		new iAccess, iCallback, iData[6], iName[64];
 		menu_item_getinfo(iMenu, iItem, iAccess, iData, charsmax(iData), iName, charsmax(iName), iCallback);
 	
