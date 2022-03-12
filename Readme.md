@@ -8,19 +8,38 @@ When plugin enables, will be add a level line in **zpsp_zombieclasses.ini**, **z
 and **zpsp_custom_weapons.ini** and you can change minimum level require for use this item/class/weapon
 
 ### Changelog:
-    - Alpha (06/03/22): First release
-    - Alpha (08/03/22): Added Upgrade System
-    - 1.0: Official Release
+- 1.0: Official Release
 
 ### Cvars:
-    - zp_xp_save_type "1" ; Save Data Type: (1 - Authid | 2 = Name | 3 = IP)
-    - zp_xp_for_kill "20" ; Xp For Kill Zombies/Humans
-    - zp_xp_for_kill_specials "30" ; Xp For Kill Zombies/Humans Specials
-    - zp_xp_infect "20" ; Xp For Infect Players
-    - zp_xp_damage_give "2" ; Xp for X damage
-    - zp_xp_damage_needed "750" ; Needed damage for give xp by damage
-    - zp_xp_vip_flag "b" ; Flag Acess to Bonus XP
-    - zp_xp_vip_bonus_xp "10" ; Bonus XP Amount
+* zp_xp_save_type "1" ; Save Data Type: (1 - Authid | 2 = Name | 3 = IP)
+* zp_xp_for_kill "20" ; Xp For Kill Zombies/Humans
+* zp_xp_for_kill_specials "30" ; Xp For Kill Zombies/Humans Specials
+* zp_xp_infect "20" ; Xp For Infect Players
+* zp_xp_damage_give "2" ; Xp for X damage
+* zp_xp_damage_needed "750" ; Needed damage for give xp by damage
+* zp_xp_vip_flag "b" ; Flag Acess to Bonus XP
+* zp_xp_vip_bonus_xp "10" ; Bonus XP Amount
+
+### Upgrades 
+- See all Here: https://github.com/PerfectScrash/ZPSp-Level-System/tree/master/scripting/upgrades
+
+### List Upgrades
+* Health (H/Z)
+* Gravity (H/Z)
+* Speed (H/Z)
+* Knockback (Z)
+* Damage (H)
+* Protection (Z)
+* Precision (H)
+* Reload (H)
+* Ammo (H)
+* Elemental Shoot (H)
+* Dodge (Z)
+* Elemental Dodge (Z)
+* Grenade Time (H)
+* Parachute (H)
+* Parachute Fall speed (H)
+* Parachute Wind resistance (H)
 
 ### Credits:
     - Supremache: For original RankSystem
