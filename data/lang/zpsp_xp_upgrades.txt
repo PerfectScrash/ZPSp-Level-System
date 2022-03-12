@@ -46,6 +46,10 @@ UPGRADE_ELSHOOT_NAME = Elemental Shoot \y[Human]
 UPGRADE_ELSHOOT_DESC = Chance of shooting fire or ice on enemies
 UPGRADE_ELSHOOT_NOTE = Your chance for shooting fire or ice is \r1 \wout of \r%d
 
+UPGRADE_ELDODGE_NAME = Elemental Dodge \r[Zombie]
+UPGRADE_ELDODGE_DESC = Fire/Frost escape chance
+UPGRADE_ELDODGE_NOTE = Your chance of escaping is \r1 \wout of \r%d
+
 UPGRADE_RELOAD_NAME = Reload Time \y[Human]
 UPGRADE_RELOAD_DESC = Reduces reload time
 UPGRADE_RELOAD_NOTE = Your reload time was reduced in \y%d%%
@@ -108,6 +112,10 @@ UPGRADE_DODGE_NOTE = Sua chance de escapar de algum tiro é de \r1 \wde \r%d
 UPGRADE_ELSHOOT_NAME = Elemental Shoot \y[Humano]
 UPGRADE_ELSHOOT_DESC = Chance de atirar fogo ou gelo nos inimigos
 UPGRADE_ELSHOOT_NOTE = Sua chance de atirar fogo ou gelo é de \r1 \wde \r%d
+
+UPGRADE_ELDODGE_NAME = Esquiva Elemental \r[Zombie]
+UPGRADE_ELDODGE_DESC = Chance de escapar do fogo/gelo
+UPGRADE_ELDODGE_NOTE = Sua chance de escapar é de \r1 \wde \r%d
 
 UPGRADE_RELOAD_NAME = Tempo de recarga \y[Humano]
 UPGRADE_RELOAD_DESC = Reduz o tempo de recarga
