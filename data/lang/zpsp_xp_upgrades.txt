@@ -9,6 +9,11 @@ UPGRADE_GRAVITY_NAME_Z = Gravity \r[Zombie]
 UPGRADE_GRAVITY_DESC = Low Gravity \d(High Jump)
 UPGRADE_GRAVITY_NOTE = Your Gravity are \y%d%%\w low
 
+UPGRADE_SPEED_NAME_H = Speed \y[Human]
+UPGRADE_SPEED_NAME_Z = Speed \r[Zombie]
+UPGRADE_SPEED_DESC = Increment max speed
+UPGRADE_SPEED_NOTE = Your current speed is being incremented by \y%d
+
 UPGRADE_DAMAGE_NAME = Attack Damage \y[Human]
 UPGRADE_DAMAGE_DESC = More attack damage on weapons
 UPGRADE_DAMAGE_NOTE = Your damage \y%d%%\w higher
@@ -16,6 +21,10 @@ UPGRADE_DAMAGE_NOTE = Your damage \y%d%%\w higher
 UPGRADE_PROTECTION_NAME = Protection \y[Human]
 UPGRADE_PROTECTION_DESC = Reduces damage taken
 UPGRADE_PROTECTION_NOTE = Your Protection against bullets are in \y%d%%
+
+UPGRADE_KNOCKBACK_NAME = Knockback \r[Zombie]
+UPGRADE_KNOCKBACK_DESC = Reduces knockback taken
+UPGRADE_KNOCKBACK_NOTE = Your knockback are reduced in \y%d%%
 
 UPGRADE_GRENADE_NAME = Grenade \y[Human]
 UPGRADE_GRENADE_DESC = Receive some grenade after a period according to the upgrade level
@@ -58,6 +67,11 @@ UPGRADE_GRAVITY_NAME_Z = Gravidade \r[Zombie]
 UPGRADE_GRAVITY_DESC = Baixa Gravidade \d(Pulo mais alto)
 UPGRADE_GRAVITY_NOTE = Sua Gravidade esta \y%d%%\w menor
 
+UPGRADE_SPEED_NAME_H = Velocidade \y[Humano]
+UPGRADE_SPEED_NAME_Z = Velocidade \r[Zombie]
+UPGRADE_SPEED_DESC = Ganho de velocidade
+UPGRADE_SPEED_NOTE = Sua velocidade atual esta sendo somada a \y%d
+
 UPGRADE_DAMAGE_NAME = Dano \y[Humano]
 UPGRADE_DAMAGE_DESC = Maior dano nas armas
 UPGRADE_DAMAGE_NOTE = Seu dano esta \y%d%%\w maior
@@ -69,6 +83,10 @@ UPGRADE_PROTECTION_NOTE = Sua proteção contra disparos esta \y%d%%
 UPGRADE_GRENADE_NAME = Granada \y[Humano]
 UPGRADE_GRENADE_DESC = Recebe alguma granada após um periodo de acordo com o nivel do upgrade
 UPGRADE_GRENADE_NOTE = Tempo para receber a granada é de \y%d Segundos
+
+UPGRADE_KNOCKBACK_NAME = Impacto \r[Zombie]
+UPGRADE_KNOCKBACK_DESC = Recebe menos impacto dos tiros
+UPGRADE_KNOCKBACK_NOTE = Seu impacto esta reduzido em \y%d%%
 
 UPGRADE_AMMO_NAME = Munição \y[Humano]
 UPGRADE_AMMO_DESC = Recebe uma bala em segundos.
