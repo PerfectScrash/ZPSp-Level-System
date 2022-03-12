@@ -42,5 +42,5 @@ and **zpsp_custom_weapons.ini** and you can change minimum level require for use
 * Parachute Wind resistance (H)
 
 ### Credits:
-    - Supremache: For original RankSystem
-    - Perfect Scrash: For this plugin
+- Supremache: For original RankSystem
+- Perfect Scrash: For this plugin
