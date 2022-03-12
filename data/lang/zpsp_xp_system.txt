@@ -99,3 +99,56 @@ ZP_NOT_HAVE_ENGOUT_XP = Voce nao tem XP Suficiente
 ZP_UPGRADE_BUY_SUCCESS = Voce Upou sua ^3[%s]^1 ao nivel ^3[%d]^1 com sucesso.
 ZP_XP_UPGRADE_MAX_SELL = Valor minimo do upgrade alcancado
 ZP_UPGRADE_SELL_SUCCESS = Voce Vendeu sua ^3[%s]^1 de nivel ^3[%d]^1 com sucesso.
+
+[es]
+ZP_XP_PREFIX = ^4[ZPSp XP]^1
+ZP_XP_NOACESS = No tienes acesso !!!
+ZP_XP_ADM_RESET = ^4*ADMIN*^1 %s^3: reiniciaste el exp del jugador ^1[%s]
+ZP_XP_ADM_SET_LVL = ^4*ADMIN*^1 %s^3: Mudaste lo nível del jugador ^1[%s]^3 para el nível ^1[%d]^3 (^1Rango: %s^3)
+ZP_XP_ADM_GIVE_XP = ^4*ADMIN*^1 %s^3: Adicionaste ^1[%d EXP(s)]^3 para el jugador ^3[%s]^1
+ZP_XP_REACHED = Chegaste lo EXP(s) ^3[%d / %d]^1.
+ZP_RANK_REACHED = Chegaste el Rango: ^3[%s]^1 y el Nível: ^3[%d]^1.
+ZP_XP_PROMOTED = Jugador ^3[%s]^1 chegaste el nível ^3%d^1 (^3Rango: %s^1)
+ZP_XP = EXP(s)
+ZP_LEVEL = Nível
+ZP_RANK = Rango
+
+ZP_XP_CMD_ERROR1 = Uso: amx_givexp <nombre> <quantidad>
+ZP_XP_CMD_ERROR2 = Jugador invalido ou multiplos alvos
+ZP_XP_CMD_ERROR3 = Uso: amx_setlvl <nombre> <quantidad>
+
+ZP_XP_ADM_GIVE_XP_LOG = *ADMIN* %s <%s>: Adicionaste [%d EXP(s)] para el jugador [%s] <%s>
+ZP_XP_ADM_SET_LVL_LOG = *ADMIN* %s <%s>: Mudaste el nivel del jugador [%s] <%s> para lo nivel [%d] (Rango: %s)
+ZP_XP_ADM_RESET_LOG = *ADMIN* %s <%s>: reiniciaste el exp del jugador [%s] <%s>
+
+ZP_XP_MENU_PREFIX = \y[ZPSp XP]\w
+ZP_XP_MENU_RESET = Reiniciar datos
+ZP_XP_MENU_MANAGE = Gerenciar niveis
+ZP_XP_MENU_LIST = Lista del Jugadores
+
+ZP_XP_MAIN_MENU = Menu Principal
+MENU_ITEM_UPGRADES = Habilidad
+MENU_ITEM_RANK_LIST = Lista del rango
+MENU_ITEM_MANAGE_DATA = Gerenciar EXP del jugadores
+MENU_ITEM_RESET_PL_DATA = Reinicar Datos del jugadores
+ZP_MENU_NOTE = Atencion
+
+ZP_UPGRADE_MAX = Maximo
+ZP_UPGRADE_MIN = Minimo
+
+ZP_XP_MENU_BACK = Anterior
+ZP_XP_MENU_NEXT = Proximo
+ZP_XP_MENU_EXIT = Salir
+
+ZP_XP_NO_UPGRADES = Las Habilidades estas desligado.
+ZP_XP_MENU_UPGRADES = Menu de las habilidades
+ZP_ITEM_UPGRADE_BUY = Compra
+ZP_ITEM_UPGRADE_SELL = Vender
+ZP_UPGRADE_ITEM_NAME = Item: \r[%s\r]
+ZP_UPGRADE_ITEM_LEVEL = Nivel: \r[%d/%d]
+ZP_UPGRADE_ITEM_DESC = Descripción: \w%s
+ZP_XP_UPGRADE_MAX_BUY = Maximo del habilidades Compradas
+ZP_NOT_HAVE_ENGOUT_XP = No tienes EXP Suficiente
+ZP_UPGRADE_BUY_SUCCESS = Tu aumentaste su habilidad ^3[%s]^1 lo nivel ^3[%d]^1.
+ZP_XP_UPGRADE_MAX_SELL = Valor minimo de la habilidad alcancado
+ZP_UPGRADE_SELL_SUCCESS = Vendeste su habilidad ^3[%s]^1 de lo nivel ^3[%d]^1 com sucesso.

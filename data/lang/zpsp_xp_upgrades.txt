@@ -131,3 +131,70 @@ UPGRADE_PARA_WIND_DESC = Permite voar de paraquedas com uma velocidade maior
 UPGRADE_WIND_RES_NOTE = Velocidade máxima que voce pode alcançar atualmente é de \y%d\d (KM/h)
 UPGRADE_FALLSPD_NOTE = Sua velocidade de queda atual esta em \y%d\d (Metros por segundos)
 ZP_XP_NEEDED_PARACHUTE = Voce Precisa Comprar um paraquedas para fazer esses upgrades.
+
+[es]
+UPGRADE_HEALTH_NAME_H = Salud \y[Humano]
+UPGRADE_HEALTH_NAME_Z = Salud \r[Zombi]
+UPGRADE_HEALTH_DESC = Salud extra durante el renacimiento
+UPGRADE_HEALTH_NOTE = Tu salud estas \y%d%%\w más grande
+
+UPGRADE_GRAVITY_NAME_H = Gravedad \y[Humano]
+UPGRADE_GRAVITY_NAME_Z = Gravedad \r[Zombi]
+UPGRADE_GRAVITY_DESC = Gravedad baja \d(Pulo más alto)
+UPGRADE_GRAVITY_NOTE = Su Gravedad estas \y%d%%\w más bajo
+
+UPGRADE_SPEED_NAME_H = Velocidad \y[Humano]
+UPGRADE_SPEED_NAME_Z = Velocidad \r[Zombi]
+UPGRADE_SPEED_DESC = Gano de velocidad
+UPGRADE_SPEED_NOTE = Su velocidad actual estas sendo somada a \y%d
+
+UPGRADE_DAMAGE_NAME = Daño \y[Humano]
+UPGRADE_DAMAGE_DESC = Maior dano de las armas
+UPGRADE_DAMAGE_NOTE = Su dano estas \y%d%%\w más grande
+
+UPGRADE_PROTECTION_NAME = Proteccion \r[Zombi]
+UPGRADE_PROTECTION_DESC = Recibe menos daño de las armas
+UPGRADE_PROTECTION_NOTE = Su protección contra tiros es de \y%d%%
+
+UPGRADE_GRENADE_NAME = Granada \y[Humano]
+UPGRADE_GRENADE_DESC = Reciba una granada después de un período de acuerdo con el nivel de actualización
+UPGRADE_GRENADE_NOTE = Tiempo para recebir la granada es de \y%d Segundos
+
+UPGRADE_KNOCKBACK_NAME = Impacto \r[Zombie]
+UPGRADE_KNOCKBACK_DESC = Recebe menos impacto de los tiros
+UPGRADE_KNOCKBACK_NOTE = Su impacto estas reducido en \y%d%%
+
+UPGRADE_AMMO_NAME = Munición \y[Humano]
+UPGRADE_AMMO_DESC = Recebe una bala extra en segundos.
+UPGRADE_AMMO_NOTE = Tiempo para recebir una bala es de \y%d segundos
+
+UPGRADE_PRECISION_NAME = Precisión \y[Humano]
+UPGRADE_PRECISION_DESC = Mayor precisión de tiro
+UPGRADE_PRECISION_NOTE = Su precisión actual es de \y%d%%
+
+UPGRADE_DODGE_NAME = Esquiva \r[Zombi]
+UPGRADE_DODGE_DESC = Posibilidad de evadir un tiro
+UPGRADE_DODGE_NOTE = Su Posibilidad de evadir de algun tiro es de \r1 \wde \r%d
+
+UPGRADE_ELSHOOT_NAME = Tiro Elemental \y[Humano]
+UPGRADE_ELSHOOT_DESC = Posibilidad de disparar fuego o hielo a los enemigos.
+UPGRADE_ELSHOOT_NOTE = Su Posibilidad de disparar fuego o hielo es de \r1 \wde \r%d
+
+UPGRADE_ELDODGE_NAME = Esquiva Elemental \r[Zombi]
+UPGRADE_ELDODGE_DESC = Posibilidad de evadir del fuego o hielo
+UPGRADE_ELDODGE_NOTE = Su Posibilidad de evadir es de \r1 \wde \r%d
+
+UPGRADE_RELOAD_NAME = Tiempo de recarga \y[Humano]
+UPGRADE_RELOAD_DESC = Reducir el tiempo de recarga
+UPGRADE_RELOAD_NOTE = Su tiempo de recarga fue reducido en \y%d%%
+UPGRADE_RELOAD_NOTE2 = Esta mejora no afecta a algunas armas de los elementos adicionales.
+
+UPGRADE_PARACHUTE_NAME = Paracaídas \y[Humano]
+UPGRADE_PARACHUTE_DESC = \r[E]\w Para Usar el paraquedas
+UPGRADE_PARA_FALLSPD_NAME = Velocidad de la caída \d[Paracaídas]
+UPGRADE_PARA_FALLSPD_DESC = Velocidad de la caída del Paracaídas
+UPGRADE_PARA_WIND_NAME = Resistencia al viento \d[Paracaídas]
+UPGRADE_PARA_WIND_DESC = Te permite volar con un paracaídas con una mayor velocidad
+UPGRADE_WIND_RES_NOTE = La velocidad máxima que puede alcanzar actualmente es de \y%d\d (KM/h)
+UPGRADE_FALLSPD_NOTE = Tu velocidad de caída actual es de \y%d\d (Metros por segundos)
+ZP_XP_NEEDED_PARACHUTE = Necesitas comprar un paracaídas para hacer estas mejoras.
