@@ -257,7 +257,6 @@ public _get_user_xp(iPlugin, iParams)
 // Native: zp_set_user_xp
 public _set_user_xp(iPlugin, iParams) {
 	g_iPlayerXP[get_param(1)] = get_param(2);
-	SaveData(get_param(1));
 	CheckLevel(get_param(1));
 }
 
@@ -268,8 +267,6 @@ public _get_user_level(iPlugin, iParams)
 // Native: zp_set_user_level
 public _set_user_level(iPlugin, iParams) {
 	g_iPlayerLevel[get_param(1)] = get_param(2);
-	
-	SaveData(get_param(1));
 	CheckLevel(get_param(1));
 }
 
