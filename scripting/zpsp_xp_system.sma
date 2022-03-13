@@ -1116,7 +1116,7 @@ public load_level_itens() {
 	g_WpnPrimaryLevel = ArrayCreate(1, 1)
 	g_WpnSecondaryLevel = ArrayCreate(1, 1)
 
-	static index, count, real_name[32], level
+	static index, count, real_name[32], level, start, Array:Temp_Array, loaded
 
 	// Zombie Class Level
 	count = zp_get_zclass_count()
@@ -1142,31 +1142,67 @@ public load_level_itens() {
 		ArrayPushCell(g_HumanClassLevel, level)
 	}
 
-	// Extra Item (Include Main Plugin Extra Itens)
+	// Extra Item
 	count = zp_get_extra_item_count()
+	start = zp_get_custom_extra_start()
+	Temp_Array = ArrayCreate(1, 1)
+	loaded = amx_load_setting_int_arr(ZP_CUSTOMIZATION_FILE, "Extra Items: Weapons and their costs", "LEVEL ITENS", Temp_Array)
 	for (index = 0; index < count; index++) {
 		zp_get_extra_item_realname(index, real_name, charsmax(real_name))
-		
-		level = 0		
-		if (!amx_load_setting_int(ZP_EXTRAITEMS_FILE, real_name, "LEVEL", level))
-			amx_save_setting_int(ZP_EXTRAITEMS_FILE, real_name, "LEVEL", level)
+
+		level = 0	
+		if(index < EXTRA_WEAPONS_STARTID) {
+			strtoupper(real_name)
+			if (!amx_load_setting_int(ZP_CUSTOMIZATION_FILE, "Hard Coded Items Costs", fmt("%s LEVEL", real_name), level))
+				amx_save_setting_int(ZP_CUSTOMIZATION_FILE, "Hard Coded Items Costs", fmt("%s LEVEL", real_name), level)
+		}	
+		else if(index < start) {
+			if(!loaded) {
+				ArrayPushCell(Temp_Array, 0)
+				if((index + 1) >= start) {
+					amx_save_setting_int_arr(ZP_CUSTOMIZATION_FILE, "Extra Items: Weapons and their costs", "LEVEL ITENS", Temp_Array)
+					ArrayDestroy(Temp_Array)
+				}
+			}
+			else {
+				level = ArrayGetCell(Temp_Array, index-EXTRA_WEAPONS_STARTID)
+			}
+		}
+		else {
+			if (!amx_load_setting_int(ZP_EXTRAITEMS_FILE, real_name, "LEVEL", level))
+				amx_save_setting_int(ZP_EXTRAITEMS_FILE, real_name, "LEVEL", level)
+		}
 		
 		ArrayPushCell(g_ItemLevel, level)
 	}
 	
 	// Player Primary Weapons (Include Main Plugin Player Weapons)
-	static start
 	count = zp_weapon_count(WPN_PRIMARY, 0)
 	start = zp_weapon_count(WPN_PRIMARY, 2)
+	Temp_Array = ArrayCreate(1, 1)
+	loaded = amx_load_setting_int_arr(ZP_CUSTOMIZATION_FILE, "Buy Menu Weapons", "PRIMARY LEVELS", Temp_Array)
 	for (index = 0; index < count; index++) {
 		zp_get_weapon_realname(WPN_PRIMARY, index, real_name, charsmax(real_name))
 		
-		if(index >= start)
-			format(real_name, charsmax(real_name), "Pri:%s", real_name)
-
 		level = 0
-		if (!amx_load_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level))
-			amx_save_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level)
+
+		if(index >= start) {
+			format(real_name, charsmax(real_name), "Pri:%s", real_name)
+			if (!amx_load_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level))
+				amx_save_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level)
+		}
+		else {
+			if(!loaded) {
+				ArrayPushCell(Temp_Array, 0)
+				if((index + 1) >= start) {
+					amx_save_setting_int_arr(ZP_CUSTOMIZATION_FILE, "Buy Menu Weapons", "PRIMARY LEVELS", Temp_Array)
+					ArrayDestroy(Temp_Array)
+				}
+			}
+			else {
+				level = ArrayGetCell(Temp_Array, index)
+			}
+		}
 		
 		ArrayPushCell(g_WpnPrimaryLevel, level)
 	}
@@ -1174,15 +1210,29 @@ public load_level_itens() {
 	// Player Secondary Weapons (Include Main Plugin Player Weapons)
 	count = zp_weapon_count(WPN_SECONDARY, 0)
 	start = zp_weapon_count(WPN_SECONDARY, 2)
+	Temp_Array = ArrayCreate(1, 1)
+	loaded = amx_load_setting_int_arr(ZP_CUSTOMIZATION_FILE, "Buy Menu Weapons", "SECONDARY LEVELS", Temp_Array)
 	for (index = 0; index < count; index++) {
 		zp_get_weapon_realname(WPN_SECONDARY, index, real_name, charsmax(real_name))
-
-		if(index >= start)
-			format(real_name, charsmax(real_name), "Sec:%s", real_name)
-		
 		level = 0		
-		if (!amx_load_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level))
-			amx_save_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level)
+
+		if(index >= start) {
+			format(real_name, charsmax(real_name), "Sec:%s", real_name)
+			if (!amx_load_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level))
+				amx_save_setting_int(ZP_WEAPONS_FILE, real_name, "LEVEL", level)
+		}
+		else {
+			if(!loaded) {
+				ArrayPushCell(Temp_Array, 0)
+				if((index + 1) >= start) {
+					amx_save_setting_int_arr(ZP_CUSTOMIZATION_FILE, "Buy Menu Weapons", "SECONDARY LEVELS", Temp_Array)
+					ArrayDestroy(Temp_Array)
+				}
+			}
+			else {
+				level = ArrayGetCell(Temp_Array, index)
+			}
+		}
 		
 		ArrayPushCell(g_WpnSecondaryLevel, level)
 	}
