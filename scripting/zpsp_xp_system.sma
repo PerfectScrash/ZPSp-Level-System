@@ -43,8 +43,16 @@ new const VAULT_NAME[] = "zpsp_xp_system" // Vault File
 // Defines/Conts
 #define GetRankName(%1) g_mPlayerData[g_iPlayerLevel[%1]][m_szRankName]
 #define MANAGE_ACESS ADMIN_ADMIN // Flag Y
-new const g_szLevelUp[] = { "vox/doop.wav" };
 #define MAX_BUFFER_STRING 250
+
+enum { SND_LVL_UP = 0, SND_BUY_UP, SND_SELL_UP, SND_ERROR }
+
+new const g_Sounds[][] = {
+	"vox/doop.wav",
+	"zpsp_xp/upgrade_purchase.wav",
+	"zpsp_xp/upgrade_sell.wav",
+	"zpsp_xp/upgrade_error.wav"
+}
 
 // Enums
 enum _:eCommandSettings { iMenuType, iCommands[MAX_BUFFER_STRING], iFlags };
@@ -214,10 +222,12 @@ public plugin_precache() {
 	g_UpgradeUseLang = ArrayCreate(1, 1)
 	g_UpgradeVaultName = ArrayCreate(MAX_BUFFER_STRING, 1)
 
-	for(new i = 0; i <= MaxClients; i++)
+	new i;
+	for(i = 0; i <= MaxClients; i++)
 		g_PlayerUpgradeLevel[i] = ArrayCreate(1, 1)
 
-	precache_sound(g_szLevelUp)
+	for(i = 0; i < sizeof g_Sounds; i++)
+		precache_sound(g_Sounds[i])
 }
 
 /*--------------*
@@ -569,6 +579,7 @@ public MenuBuyUpgrade(id) {
 
 	if(g_ReturnResult >= ZP_PLUGIN_HANDLED) {
 		MenuUpgrades(id);
+		client_cmd(id, "spk %s", g_Sounds[SND_ERROR])
 		return
 	}
 
@@ -656,12 +667,14 @@ public MenuBuyUpgradeHandler(id, iMenu, iItem) {
 		ExecuteForward(g_forwards[FW_UPGRADE_BUY_PRE], g_ReturnResult, id, Up_Index)
 		if(g_ReturnResult >= ZP_PLUGIN_HANDLED) {
 			MenuBuyUpgrade(id);
+			client_cmd(id, "spk %s", g_Sounds[SND_ERROR])
 			menu_destroy(iMenu)
 			return PLUGIN_HANDLED
 		}
 		if(CurrentLevel >= MaxLvl) {
 			client_print_color(id, print_team_default, "%L %L", id, "ZP_XP_PREFIX", id, "ZP_XP_UPGRADE_MAX_BUY");
 			MenuBuyUpgrade(id);
+			client_cmd(id, "spk %s", g_Sounds[SND_ERROR])
 			menu_destroy(iMenu)
 			return PLUGIN_HANDLED
 		}
@@ -670,6 +683,7 @@ public MenuBuyUpgradeHandler(id, iMenu, iItem) {
 		if(g_iPlayerXP[id] < Value) {
 			client_print_color(id, print_team_default, "%L %L", id, "ZP_XP_PREFIX", id, "ZP_NOT_HAVE_ENGOUT_XP");
 			MenuBuyUpgrade(id);
+			client_cmd(id, "spk %s", g_Sounds[SND_ERROR])
 			menu_destroy(iMenu)
 			return PLUGIN_HANDLED
 		}
@@ -677,7 +691,7 @@ public MenuBuyUpgradeHandler(id, iMenu, iItem) {
 		ArraySetCell(g_PlayerUpgradeLevel[id], Up_Index, CurrentLevel+1)
 		RemoveXP(id, Value)
 		ExecuteForward(g_forwards[FW_UPGRADE_BUY_POST], g_ReturnResult, id, Up_Index)
-
+		client_cmd(id, "spk %s", g_Sounds[SND_BUY_UP])
 		client_print_color(id, print_team_default, "%L %L", id, "ZP_XP_PREFIX", id, "ZP_UPGRADE_BUY_SUCCESS", UpgradeName, CurrentLevel+1);
 	}
 	else {
@@ -685,12 +699,14 @@ public MenuBuyUpgradeHandler(id, iMenu, iItem) {
 		if(g_ReturnResult >= ZP_PLUGIN_HANDLED) {
 			MenuBuyUpgrade(id);
 			menu_destroy(iMenu)
+			client_cmd(id, "spk %s", g_Sounds[SND_ERROR])
 			return PLUGIN_HANDLED
 		}
 		if(CurrentLevel <= 0) {
 			client_print_color(id, print_team_default, "%L %L", id, "ZP_XP_PREFIX", id, "ZP_XP_UPGRADE_MAX_SELL");
 			MenuBuyUpgrade(id);
 			menu_destroy(iMenu)
+			client_cmd(id, "spk %s", g_Sounds[SND_ERROR])
 			return PLUGIN_HANDLED
 		}
 
@@ -700,7 +716,7 @@ public MenuBuyUpgradeHandler(id, iMenu, iItem) {
 		ArraySetCell(g_PlayerUpgradeLevel[id], Up_Index, CurrentLevel-1)
 		AddXP(id, Value, 0)
 		ExecuteForward(g_forwards[FW_UPGRADE_SELL_POST], g_ReturnResult, id, Up_Index)
-
+		client_cmd(id, "spk %s", g_Sounds[SND_SELL_UP])
 		client_print_color(id, print_team_default, "%L %L", id, "ZP_XP_PREFIX", id, "ZP_UPGRADE_SELL_SUCCESS", UpgradeName, CurrentLevel-1);
 	}
 	SaveUpgrades(id, Up_Index);
@@ -846,7 +862,7 @@ public Rank_Handler(id, iMenu, iItem) {
 	
 		g_iPlayerXP[iTarget] = g_mPlayerData[iLvl][m_iRankXP];
 		g_iPlayerLevel[iTarget] = iLvl;
-		client_cmd(iTarget, "spk %s", g_szLevelUp)
+		client_cmd(iTarget, "spk %s", g_Sounds[SND_LVL_UP])
 		SaveData(iTarget)
 	
 		Log("%L", LANG_SERVER, "ZP_XP_ADM_SET_LVL_LOG", szPlayerName[id], szPlayerAuthid[id], szPlayerName[iTarget], szPlayerAuthid[iTarget], g_iPlayerLevel[iTarget], GetRankName(iTarget));
@@ -924,7 +940,7 @@ public SetLevels(id, nLevel, nCid) {
 	
 	g_iPlayerLevel[iTarget] = iLevel
 	g_iPlayerXP[iTarget] = g_mPlayerData[g_iPlayerLevel[iTarget]][m_iRankXP] 
-	client_cmd(iTarget, "spk %s", g_szLevelUp)
+	client_cmd(iTarget, "spk %s", g_Sounds[SND_LVL_UP])
 	SaveData(iTarget)
 	
 	console_print(id, "%L", id, "ZP_XP_ADM_SET_LVL_LOG", szPlayerName[id], szPlayerAuthid[id], szPlayerName[iTarget], szPlayerAuthid[iTarget], iLevel, GetRankName(iTarget));
@@ -1007,7 +1023,7 @@ public CheckLevel(iPlayer) {
 	
 	while(g_iPlayerXP[iPlayer] >= g_mPlayerData[g_iPlayerLevel[iPlayer]+1][m_iRankXP]) {
 		g_iPlayerLevel[iPlayer]++;
-		client_cmd(iPlayer, "spk %s", g_szLevelUp)
+		client_cmd(iPlayer, "spk %s", g_Sounds[SND_LVL_UP])
 		ExecuteForward(g_forwards[FW_LEVEL_UP], g_ReturnResult, iPlayer, g_iPlayerLevel[iPlayer], g_iPlayerXP[iPlayer])
 		client_print_color(0, print_team_default, "%L %L", LANG_PLAYER, "ZP_XP_PREFIX", LANG_PLAYER, "ZP_XP_PROMOTED", szPlayerName[iPlayer], g_iPlayerLevel[iPlayer], GetRankName(iPlayer));
 	}
