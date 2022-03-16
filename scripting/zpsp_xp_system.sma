@@ -1074,13 +1074,13 @@ stock LoadData(id) {
 			formatex(szKey, charsmax(szKey), "%s-ID", szPlayerAuthid[id]);
 	}
 	
-	formatex(szData, charsmax(szData), "%i#%i#", g_iPlayerLevel[id], g_iPlayerXP[id])
-	fvault_get_data(VAULT_NAME, szKey, szData, charsmax(szData))
-		
-	replace_string(szData, charsmax(szData), "#", " ")
-	parse(szData, szLevel, charsmax(szLevel), szXP, charsmax(szXP))
-	g_iPlayerLevel[id] = str_to_num(szLevel)
-	g_iPlayerXP[id] = str_to_num(szXP)
+	//formatex(szData, charsmax(szData), "%i#%i#", g_iPlayerLevel[id], g_iPlayerXP[id])
+	if(fvault_get_data(VAULT_NAME, szKey, szData, charsmax(szData))) {
+		replace_string(szData, charsmax(szData), "#", " ")
+		parse(szData, szLevel, charsmax(szLevel), szXP, charsmax(szXP))
+		g_iPlayerLevel[id] = str_to_num(szLevel)
+		g_iPlayerXP[id] = str_to_num(szXP)
+	}
 
 	new VaultName[MAX_BUFFER_STRING], MaxLevel, Level, szData2[10]
 	for(new i = 0; i < g_UpgradeCount; i++) {
