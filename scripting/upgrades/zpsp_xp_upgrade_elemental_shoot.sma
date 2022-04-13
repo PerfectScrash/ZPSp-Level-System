@@ -6,6 +6,7 @@
 
 		* Changelog:
 			- 1.0: First Release
+			- 1.1: Fix bug that zombies can frost/burn others zombies (Thanks 8K300FPS) for repoort
 
 =============================================*/
 
@@ -31,7 +32,7 @@ new const Chance[up_max_level] = {
 
 new g_UpgradeId
 public plugin_init() {
-	register_plugin("[ZPSp] XP Upgrade: Elemental Shoot", "1.0", "Perf. Scrash")
+	register_plugin("[ZPSp] XP Upgrade: Elemental Shoot", "1.1", "Perf. Scrash")
 	register_dictionary("zpsp_xp_upgrades.txt")
 
 	RegisterHam(Ham_TakeDamage, "player", "fw_TakeDamage") // More Damage on players
@@ -43,7 +44,7 @@ public fw_TakeDamage(victim, inflictor, attacker, Float:damage, dmg_type) { // H
 	if(!is_user_alive(attacker) || !is_user_alive(victim))
 		return HAM_IGNORED;
 
-	if(!zp_get_user_zombie(victim) || zp_get_human_special_class(attacker))
+	if(!zp_get_user_zombie(victim) || zp_get_human_special_class(attacker) || zp_get_user_zombie(attacker))
 		return HAM_IGNORED;
 
 	static level; level = zp_get_user_upgrade_lvl(attacker, g_UpgradeId)
