@@ -827,7 +827,7 @@ public ResetPlayerRank(id, iPlayer) {
 			formatex(szKey, charsmax(szKey), "%s-NAME", auth_mode);
 		}
 		case 3: {
-			get_user_ip(iPlayer, auth_mode, charsmax(auth_mode));
+			get_user_ip(iPlayer, auth_mode, charsmax(auth_mode), 1);
 			formatex(szKey, charsmax(szKey), "%s-IP", auth_mode);
 		}
 		default: {
@@ -1089,7 +1089,7 @@ stock SaveData(id) {
 			formatex(szKey, charsmax(szKey), "%s-NAME", auth_mode);
 		}
 		case 3: {
-			get_user_ip(id, auth_mode, charsmax(auth_mode));
+			get_user_ip(id, auth_mode, charsmax(auth_mode), 1);
 			formatex(szKey, charsmax(szKey), "%s-IP", auth_mode);
 		}
 		default: {
@@ -1115,7 +1115,7 @@ stock SaveUpgrades(id, Up_Index) {
 			formatex(szKey, charsmax(szKey), "%s-NAME", auth_mode);
 		}
 		case 3: {
-			get_user_ip(id, auth_mode, charsmax(auth_mode));
+			get_user_ip(id, auth_mode, charsmax(auth_mode), 1);
 			formatex(szKey, charsmax(szKey), "%s-IP", auth_mode);
 		}
 		default: {
@@ -1143,7 +1143,7 @@ stock LoadData(id) {
 			formatex(szKey, charsmax(szKey), "%s-NAME", auth_mode);
 		}
 		case 3: {
-			get_user_ip(id, auth_mode, charsmax(auth_mode));
+			get_user_ip(id, auth_mode, charsmax(auth_mode), 1);
 			formatex(szKey, charsmax(szKey), "%s-IP", auth_mode);
 		}
 		default: {
