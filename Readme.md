@@ -8,7 +8,10 @@ When plugin enables, will be add a level line in **zpsp_zombieclasses.ini**, **z
 and **zpsp_custom_weapons.ini** and you can change minimum level require for use this item/class/weapon
 
 ### Changelog:
-- 1.0: Official Release
+* 1.0: 
+    - Official Release
+* 1.1: 
+    - Fix Load/Save XP/Upgrade
 
 ### Cvars:
 * zp_xp_save_type "1" ; Save Data Type: (1 - Authid | 2 = Name | 3 = IP)

@@ -12,6 +12,7 @@
 		- Alpha (06/03/22): First release
 		- Alpha (08/03/22): Added Upgrade System
 		- 1.0: Official Release
+		- 1.1: Fix Load/Save XP/Upgrade
 
 	-> Cvars:
 		- zp_xp_save_type "1" ; Save Data Type: (1 - Authid | 2 = Name | 3 = IP)
@@ -32,6 +33,7 @@
 #include <amxmisc>
 #include <cstrike>
 #include <fvault>
+#include <fakemeta>
 #include <hamsandwich>
 #include <amx_settings_api>
 #include <zombie_plague_special>
@@ -147,7 +149,7 @@ enum {
 new g_forwards[MAX_FORWARDS], g_ReturnResult
 
 // Variables
-new g_iPlayerXP[33], g_iPlayerLevel[33], szPlayerAuthid[33][33], szPlayerName[33][33], szPlayerIP[33][33], g_iPlayerMenu[33], g_damagedealt[33], g_PageUpgrades[33]
+new g_iPlayerXP[33], g_iPlayerLevel[33], g_iPlayerMenu[33], g_damagedealt[33], g_PageUpgrades[33]
 new cvar_savetype, cvar_xp_kill, cvar_xp_kill_specials, cvar_xp_infect, cvar_vip_bonus_xp, cvar_vip_bonus_flag, cvar_xp_damage_give, cvar_xp_damage_needed;
 new Array:g_ItemLevel, Array:g_ZombieClassLevel, Array:g_HumanClassLevel, Array:g_WpnPrimaryLevel, Array:g_WpnSecondaryLevel
 new g_SaveType, g_VipFlag, g_HudSync, g_AdditionalText[MAX_BUFFER_STRING], g_AdditionalNote[500];
@@ -156,7 +158,7 @@ new Array:g_UpgradeName, Array:g_UpgradeDesc, Array:g_UpgradePriceHandler, Array
 // Plugin Initializing
 public plugin_init() {
 	// Register Plugin
-	register_plugin("[ZPSp] Addon: XP System", "1.0", "Supremache | Perf. Scrash");
+	register_plugin("[ZPSp] Addon: XP System", "1.1", "Supremache | Perf. Scrash");
 
 	// Dictionary
 	register_dictionary("zpsp_xp_system.txt")
@@ -164,6 +166,7 @@ public plugin_init() {
 	// Register Events
 	RegisterHam(Ham_Killed, "player", "fw_PlayerKilled_Post", 1)
 	RegisterHam(Ham_TakeDamage, "player", "fw_TakeDamage_Post", 1)
+	register_forward( FM_ClientUserInfoChanged, "fw_ClientUserInfoChanged" );
 
 	// Save Data Type: (1 - Authid | 2 = Name | 3 = IP)
 	cvar_savetype = register_cvar("zp_xp_save_type", "1")
@@ -389,31 +392,39 @@ public _add_note(plugin_id, num_params) {
 * Client Info *
 *--------------------------------*/
 public client_putinserver(id) {
-	get_user_name(id, szPlayerName[id], charsmax(szPlayerName[]));
-	get_user_authid(id, szPlayerAuthid[id], charsmax(szPlayerAuthid[]));
-	get_user_ip(id, szPlayerIP[id], charsmax(szPlayerIP[]), 1)
-
-	if(!is_user_hltv(id) && !is_user_bot(id))
-		LoadData(id);
-}
-
-public client_disconnected(id) {
-	if(!is_user_hltv(id) && !is_user_bot(id))
-		SaveData(id);
 
 	g_damagedealt[id] = 0
 	g_iPlayerXP[id] = 0
 	g_iPlayerLevel[id] = 0
 	g_PageUpgrades[id] = 0
+
+	if(!is_user_hltv(id) && !is_user_bot(id))
+		LoadData(id);
+	
 }
 
-public client_infochanged(id) {
-	if(!is_user_connected(id)) 
-		return PLUGIN_CONTINUE;
+public client_disconnected(id) {
+	if(!is_user_hltv(id) && !is_user_bot(id))
+		SaveData(id);
+}
 
-	get_user_info(id, "name", szPlayerName[id], charsmax(szPlayerName[]));
-	
-	return PLUGIN_CONTINUE;
+
+// Block name change if savetype as by name
+public fw_ClientUserInfoChanged( id, const buffer )
+{
+	if(!is_user_connected(id)  || g_SaveType != 2 )
+		return FMRES_IGNORED;
+
+	static newName[33], curname[33];
+	engfunc(EngFunc_InfoKeyValue, buffer, "name", newName, charsmax(newName));
+	get_user_name(id, curname, charsmax(curname))
+
+	if(equal(newName, curname))
+		return FMRES_IGNORED
+
+	set_user_info(id, "name", curname)
+	client_cmd(id, "setinfo ^"name^" ^"%s^"", curname)
+	return FMRES_SUPERCEDE;
 }
 
 /*--------------------------------*
@@ -763,9 +774,11 @@ public PlayerRank(id, iFlag) {
 	iMenu = menu_create(szTitle, "Handler")
 	get_players(iPlayers, iPnum, "ch"); SortCustom1D(iPlayers, iPnum, "sort_players_by_xp")
 	
+	static name[32]
 	for(new szItem[1024], iPlayer, i; i < iPnum; i++) {
 		iPlayer = iPlayers[i]
-		formatex(szItem, charsmax(szItem), "\d[%i %L] \w%s \r[\y%L %i: %s\r]", g_iPlayerXP[iPlayer], id, "ZP_XP", szPlayerName[iPlayer], id, "ZP_LEVEL", g_iPlayerLevel[iPlayer], GetRankName(iPlayer));
+		get_user_name(iPlayer, name, charsmax(name))
+		formatex(szItem, charsmax(szItem), "\d[%i %L] \w%s \r[\y%L %i: %s\r]", g_iPlayerXP[iPlayer], id, "ZP_XP", name, id, "ZP_LEVEL", g_iPlayerLevel[iPlayer], GetRankName(iPlayer));
 		menu_additem(iMenu, szItem, fmt("%d", iPlayer))
 	}
 	
@@ -806,17 +819,22 @@ public ResetPlayerRank(id, iPlayer) {
 	g_iPlayerXP[iPlayer] = 0
 	g_iPlayerLevel[iPlayer] = 0
 
-	new szKey[64], VaultName[MAX_BUFFER_STRING];
+	new szKey[64], VaultName[MAX_BUFFER_STRING], auth_mode[64];
 
 	switch(g_SaveType) {
-		case 2: 
-			formatex(szKey, charsmax(szKey), "%s-NAME", szPlayerName[iPlayer])
-		case 3: 
-			formatex(szKey, charsmax(szKey), "%s-IP", szPlayerIP[iPlayer])
-		default: 
-			formatex(szKey, charsmax(szKey), "%s-ID", szPlayerAuthid[iPlayer])
+		case 2: {
+			get_user_name(iPlayer, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-NAME", auth_mode);
+		}
+		case 3: {
+			get_user_ip(iPlayer, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-IP", auth_mode);
+		}
+		default: {
+			get_user_authid(iPlayer, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-ID", auth_mode);
+		}
 	}
-
 	fvault_remove_key(VAULT_NAME, szKey) // Remove XP info
 
 	// Reset Upgrades
@@ -826,8 +844,14 @@ public ResetPlayerRank(id, iPlayer) {
 		fvault_remove_key(VaultName, szKey)
 	}
 
-	Log("%L", LANG_SERVER, "ZP_XP_ADM_RESET_LOG", szPlayerName[id], szPlayerAuthid[id], szPlayerName[iPlayer], szPlayerAuthid[iPlayer]);
-	client_print_color(0, print_team_default, "%L", LANG_PLAYER, "ZP_XP_ADM_RESET", szPlayerName[id], szPlayerName[iPlayer]);
+	
+	static admin_name[32], admin_authid[64], player_name[32], player_authid[64]
+	get_user_name(id, admin_name, charsmax(admin_name));
+	get_user_authid(id, admin_authid, charsmax(admin_authid));
+	get_user_name(iPlayer, player_name, charsmax(player_name));
+	get_user_authid(iPlayer, player_authid, charsmax(player_authid));
+	Log("%L", LANG_SERVER, "ZP_XP_ADM_RESET_LOG", admin_name, admin_authid, player_name, player_authid);
+	client_print_color(0, print_team_default, "%L", LANG_PLAYER, "ZP_XP_ADM_RESET", admin_name, player_name);
 	
 	SaveData(iPlayer);
 	return PLUGIN_CONTINUE;
@@ -856,14 +880,24 @@ public Rank_Handler(id, iMenu, iItem) {
 		parse(iData, szPlayer, charsmax(szPlayer), szLevel, charsmax(szLevel))
 		iTarget = str_to_num(szPlayer);
 		iLvl = str_to_num(szLevel);
+
+		if(!is_user_connected(iTarget)) {
+			menu_destroy(iMenu)
+			return;
+		}
 	
 		g_iPlayerXP[iTarget] = g_mPlayerData[iLvl][m_iRankXP];
 		g_iPlayerLevel[iTarget] = iLvl;
 		client_cmd(iTarget, "spk %s", g_Sounds[SND_LVL_UP])
 		SaveData(iTarget)
 	
-		Log("%L", LANG_SERVER, "ZP_XP_ADM_SET_LVL_LOG", szPlayerName[id], szPlayerAuthid[id], szPlayerName[iTarget], szPlayerAuthid[iTarget], g_iPlayerLevel[iTarget], GetRankName(iTarget));
-		client_print_color(iTarget, print_team_default, "%L", iTarget, "ZP_XP_ADM_SET_LVL", szPlayerName[id], szPlayerName[iTarget], g_iPlayerLevel[iTarget], GetRankName(iTarget));
+		static admin_name[32], admin_authid[64], player_name[32], player_authid[64]
+		get_user_name(id, admin_name, charsmax(admin_name));
+		get_user_authid(id, admin_authid, charsmax(admin_authid));
+		get_user_name(iTarget, player_name, charsmax(player_name));
+		get_user_authid(iTarget, player_authid, charsmax(player_authid));
+		Log("%L", LANG_SERVER, "ZP_XP_ADM_SET_LVL_LOG", admin_name, admin_authid, player_name, player_authid, g_iPlayerLevel[iTarget], GetRankName(iTarget));
+		client_print_color(iTarget, print_team_default, "%L", iTarget, "ZP_XP_ADM_SET_LVL", admin_name, player_name, g_iPlayerLevel[iTarget], GetRankName(iTarget));
 	}
 	menu_destroy(iMenu)
 }	
@@ -896,10 +930,16 @@ public GiveEXP(id, nLevel, nCid) {
 	}
 	
 	AddXP(iTarget, iXP, 0)
-	console_print(id, "%L", id, "ZP_XP_ADM_GIVE_XP_LOG", szPlayerName[id], szPlayerAuthid[id], iXP, szPlayerName[iTarget], szPlayerAuthid[iTarget]);
-	Log("%L", LANG_SERVER, "ZP_XP_ADM_GIVE_XP_LOG", szPlayerName[id], szPlayerAuthid[id], iXP, szPlayerName[iTarget], szPlayerAuthid[iTarget]);
+
+	static admin_name[32], admin_authid[64], player_name[32], player_authid[64]
+	get_user_name(id, admin_name, charsmax(admin_name));
+	get_user_authid(id, admin_authid, charsmax(admin_authid));
+	get_user_name(iTarget, player_name, charsmax(player_name));
+	get_user_authid(iTarget, player_authid, charsmax(player_authid));
+	console_print(id, "%L", id, "ZP_XP_ADM_GIVE_XP_LOG", admin_name, admin_authid, iXP, player_name, player_authid);
+	Log("%L", LANG_SERVER, "ZP_XP_ADM_GIVE_XP_LOG", admin_name, admin_authid, iXP, player_name, player_authid);
 	
-	client_print_color(0, print_team_default, "%L", LANG_PLAYER, "ZP_XP_ADM_GIVE_XP", szPlayerName[id], iXP, szPlayerName[iTarget]);
+	client_print_color(0, print_team_default, "%L", LANG_PLAYER, "ZP_XP_ADM_GIVE_XP", admin_name, iXP, player_name);
 	client_print_color(iTarget, print_team_default, "%L %L ", iTarget, "ZP_XP_PREFIX", iTarget, "ZP_XP_REACHED", g_iPlayerXP[iTarget], g_mPlayerData[g_iPlayerLevel[iTarget]+ 1][m_iRankXP]);
 		
 	return PLUGIN_HANDLED
@@ -939,11 +979,16 @@ public SetLevels(id, nLevel, nCid) {
 	g_iPlayerXP[iTarget] = g_mPlayerData[g_iPlayerLevel[iTarget]][m_iRankXP] 
 	client_cmd(iTarget, "spk %s", g_Sounds[SND_LVL_UP])
 	SaveData(iTarget)
+
+	static admin_name[32], admin_authid[64], player_name[32], player_authid[64]
+	get_user_name(id, admin_name, charsmax(admin_name));
+	get_user_authid(id, admin_authid, charsmax(admin_authid));
+	get_user_name(iTarget, player_name, charsmax(player_name));
+	get_user_authid(iTarget, player_authid, charsmax(player_authid));	
+	console_print(id, "%L", id, "ZP_XP_ADM_SET_LVL_LOG", admin_name, admin_authid, player_name, player_authid, iLevel, GetRankName(iTarget));
+	Log("%L", LANG_SERVER, "ZP_XP_ADM_SET_LVL_LOG", admin_name, admin_authid, player_name, player_authid, iLevel, GetRankName(iTarget));
 	
-	console_print(id, "%L", id, "ZP_XP_ADM_SET_LVL_LOG", szPlayerName[id], szPlayerAuthid[id], szPlayerName[iTarget], szPlayerAuthid[iTarget], iLevel, GetRankName(iTarget));
-	Log("%L", LANG_SERVER, "ZP_XP_ADM_SET_LVL_LOG", szPlayerName[id], szPlayerAuthid[id], szPlayerName[iTarget], szPlayerAuthid[iTarget], iLevel, GetRankName(iTarget));
-	
-	client_print_color(iTarget, print_team_default, "%L", iTarget, "ZP_XP_ADM_SET_LVL", szPlayerName[id], szPlayerName[iTarget], g_iPlayerLevel[iTarget], GetRankName(iTarget));
+	client_print_color(iTarget, print_team_default, "%L", iTarget, "ZP_XP_ADM_SET_LVL", admin_name, player_name, g_iPlayerLevel[iTarget], GetRankName(iTarget));
 	client_print_color(iTarget, print_team_default, "%L %L", iTarget, "ZP_XP_PREFIX", iTarget, "ZP_RANK_REACHED", GetRankName(iTarget), g_iPlayerLevel[iTarget]);
 		
 	return PLUGIN_HANDLED
@@ -1018,11 +1063,13 @@ public CheckLevel(iPlayer) {
 		return;
 	}
 	
+	static name[32]
 	while(g_iPlayerXP[iPlayer] >= g_mPlayerData[g_iPlayerLevel[iPlayer]+1][m_iRankXP]) {
 		g_iPlayerLevel[iPlayer]++;
 		client_cmd(iPlayer, "spk %s", g_Sounds[SND_LVL_UP])
 		ExecuteForward(g_forwards[FW_LEVEL_UP], g_ReturnResult, iPlayer, g_iPlayerLevel[iPlayer], g_iPlayerXP[iPlayer])
-		client_print_color(0, print_team_default, "%L %L", LANG_PLAYER, "ZP_XP_PREFIX", LANG_PLAYER, "ZP_XP_PROMOTED", szPlayerName[iPlayer], g_iPlayerLevel[iPlayer], GetRankName(iPlayer));
+		get_user_name(iPlayer, name, charsmax(name))
+		client_print_color(0, print_team_default, "%L %L", LANG_PLAYER, "ZP_XP_PREFIX", LANG_PLAYER, "ZP_XP_PROMOTED", name, g_iPlayerLevel[iPlayer], GetRankName(iPlayer));
 	}
 	SaveData(iPlayer)
 }
@@ -1031,31 +1078,53 @@ public CheckLevel(iPlayer) {
 * SAVE/LOAD Data *
 *----------------*/
 stock SaveData(id) {
-	new szKey[64], szData[256];
+	if(is_user_bot(id) || is_user_hltv(id))
+		return;
+
+	new szKey[64], szData[256], auth_mode[64];
 
 	switch(g_SaveType) {
-		case 2: 
-			formatex(szKey, charsmax(szKey), "%s-NAME", szPlayerName[id])
-		case 3: 
-			formatex(szKey, charsmax(szKey), "%s-IP", szPlayerIP[id])
-		default: 
-			formatex(szKey, charsmax(szKey), "%s-ID", szPlayerAuthid[id])
+		case 2: {
+			get_user_name(id, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-NAME", auth_mode);
+		}
+		case 3: {
+			get_user_ip(id, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-IP", auth_mode);
+		}
+		default: {
+			get_user_authid(id, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-ID", auth_mode);
+		}
 	}
+	if(!auth_mode[0])
+		return;
 	
 	formatex(szData, charsmax(szData), "%i#%i#", g_iPlayerLevel[id], g_iPlayerXP[id])
 	fvault_set_data(VAULT_NAME, szKey, szData)
 }
 
 stock SaveUpgrades(id, Up_Index) {
-	new szKey[64], CurrentLevel, VaultName[MAX_BUFFER_STRING]
+	if(is_user_bot(id) || is_user_hltv(id))
+		return;
+	
+	new szKey[64], CurrentLevel, VaultName[MAX_BUFFER_STRING], auth_mode[64]
 	switch(g_SaveType) {
-		case 2: 
-			formatex(szKey, charsmax(szKey), "%s-NAME", szPlayerName[id])
-		case 3: 
-			formatex(szKey, charsmax(szKey), "%s-IP", szPlayerIP[id])
-		default: 
-			formatex(szKey, charsmax(szKey), "%s-ID", szPlayerAuthid[id])
+		case 2: {
+			get_user_name(id, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-NAME", auth_mode);
+		}
+		case 3: {
+			get_user_ip(id, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-IP", auth_mode);
+		}
+		default: {
+			get_user_authid(id, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-ID", auth_mode);
+		}
 	}
+	if(!auth_mode[0])
+		return;
 
 	CurrentLevel = ArrayGetCell(g_PlayerUpgradeLevel[id], Up_Index)
 	ArrayGetString(g_UpgradeVaultName, Up_Index, VaultName, charsmax(VaultName))
@@ -1063,21 +1132,33 @@ stock SaveUpgrades(id, Up_Index) {
 }
 
 stock LoadData(id) {
-	new szKey[64], szData[256], szXP[32], szLevel[32];
+	if(is_user_bot(id) || is_user_hltv(id))
+		return;
+
+	new szKey[64], szData[256], szXP[32], szLevel[32], auth_mode[64];
 	
 	switch(g_SaveType) {
-		case 2: 
-			formatex(szKey, charsmax(szKey), "%s-NAME", szPlayerName[id]);
-		case 3: 
-			formatex(szKey, charsmax(szKey), "%s-IP", szPlayerIP[id]);
-		default: 
-			formatex(szKey, charsmax(szKey), "%s-ID", szPlayerAuthid[id]);
+		case 2: {
+			get_user_name(id, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-NAME", auth_mode);
+		}
+		case 3: {
+			get_user_ip(id, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-IP", auth_mode);
+		}
+		default: {
+			get_user_authid(id, auth_mode, charsmax(auth_mode));
+			formatex(szKey, charsmax(szKey), "%s-ID", auth_mode);
+		}
 	}
+	if(!auth_mode[0])
+		return;
 	
-	//formatex(szData, charsmax(szData), "%i#%i#", g_iPlayerLevel[id], g_iPlayerXP[id])
+
 	if(fvault_get_data(VAULT_NAME, szKey, szData, charsmax(szData))) {
 		replace_string(szData, charsmax(szData), "#", " ")
 		parse(szData, szLevel, charsmax(szLevel), szXP, charsmax(szXP))
+	
 		g_iPlayerLevel[id] = str_to_num(szLevel)
 		g_iPlayerXP[id] = str_to_num(szXP)
 	}
