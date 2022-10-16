@@ -13,6 +13,7 @@
 		- Alpha (08/03/22): Added Upgrade System
 		- 1.0: Official Release
 		- 1.1: Fix Load/Save XP/Upgrade
+		- 1.2: Fixed index out of bounds error
 
 	-> Cvars:
 		- zp_xp_save_type "1" ; Save Data Type: (1 - Authid | 2 = Name | 3 = IP)
@@ -1014,7 +1015,7 @@ public fw_PlayerKilled_Post(victim, attacker) {
 }
 // Damage Reward
 public fw_TakeDamage_Post(victim, inflictor, attacker, Float:damage, damage_type) { // Ham Take Damage Forward
-	if(!is_user_alive(victim))
+	if(!is_user_alive(victim) || !is_user_alive(attacker))
 		return HAM_IGNORED;
 
 	new DmgGive = get_pcvar_num(cvar_xp_damage_give)
