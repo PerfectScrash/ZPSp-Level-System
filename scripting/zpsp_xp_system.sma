@@ -150,7 +150,7 @@ enum {
 new g_forwards[MAX_FORWARDS], g_ReturnResult
 
 // Variables
-new g_iPlayerXP[33], g_iPlayerLevel[33], g_iPlayerMenu[33], g_damagedealt[33], g_PageUpgrades[33]
+new g_iPlayerXP[33], g_iPlayerLevel[33], g_iPlayerMenu[33], g_damagedealt[33], g_PageUpgrades[33], g_loadedData[33]
 new cvar_savetype, cvar_xp_kill, cvar_xp_kill_specials, cvar_xp_infect, cvar_vip_bonus_xp, cvar_vip_bonus_flag, cvar_xp_damage_give, cvar_xp_damage_needed;
 new Array:g_ItemLevel, Array:g_ZombieClassLevel, Array:g_HumanClassLevel, Array:g_WpnPrimaryLevel, Array:g_WpnSecondaryLevel
 new g_SaveType, g_VipFlag, g_HudSync, g_AdditionalText[MAX_BUFFER_STRING], g_AdditionalNote[500];
@@ -393,20 +393,22 @@ public _add_note(plugin_id, num_params) {
 * Client Info *
 *--------------------------------*/
 public client_putinserver(id) {
-
-	g_damagedealt[id] = 0
-	g_iPlayerXP[id] = 0
-	g_iPlayerLevel[id] = 0
-	g_PageUpgrades[id] = 0
-
 	if(!is_user_hltv(id) && !is_user_bot(id))
 		LoadData(id);
-	
 }
 
 public client_disconnected(id) {
 	if(!is_user_hltv(id) && !is_user_bot(id))
 		SaveData(id);
+
+	g_damagedealt[id] = 0
+	g_PageUpgrades[id] = 0
+	g_loadedData[id] = false
+}
+
+public plugin_end() {
+	for(new i = 1; i <= MaxClients; i++)
+		SaveData(i)
 }
 
 
@@ -1082,6 +1084,9 @@ stock SaveData(id) {
 	if(is_user_bot(id) || is_user_hltv(id))
 		return;
 
+	if(!g_loadedData[id])
+		return
+
 	new szKey[64], szData[256], auth_mode[64];
 
 	switch(g_SaveType) {
@@ -1133,8 +1138,11 @@ stock SaveUpgrades(id, Up_Index) {
 }
 
 stock LoadData(id) {
-	if(is_user_bot(id) || is_user_hltv(id))
+	if(is_user_bot(id) || is_user_hltv(id)) {
+		g_iPlayerXP[id] = 0
+		g_iPlayerLevel[id] = 0
 		return;
+	}
 
 	new szKey[64], szData[256], szXP[32], szLevel[32], auth_mode[64];
 	
@@ -1163,6 +1171,10 @@ stock LoadData(id) {
 		g_iPlayerLevel[id] = str_to_num(szLevel)
 		g_iPlayerXP[id] = str_to_num(szXP)
 	}
+	else {
+		g_iPlayerXP[id] = 0
+		g_iPlayerLevel[id] = 0
+	}
 
 	new VaultName[MAX_BUFFER_STRING], MaxLevel, Level, szData2[10]
 	for(new i = 0; i < g_UpgradeCount; i++) {
@@ -1183,6 +1195,8 @@ stock LoadData(id) {
 	
 		ArraySetCell(g_PlayerUpgradeLevel[id], i, Level)
 	}
+
+	g_loadedData[id] = true
 }
 
 
