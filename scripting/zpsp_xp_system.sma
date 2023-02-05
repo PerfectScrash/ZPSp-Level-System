@@ -14,6 +14,7 @@
 		- 1.0: Official Release
 		- 1.1: Fix Load/Save XP/Upgrade
 		- 1.2: Fixed index out of bounds error
+		- 1.3: Fixed Save/Load XP/Level when user disconnect on loading
 
 	-> Cvars:
 		- zp_xp_save_type "1" ; Save Data Type: (1 - Authid | 2 = Name | 3 = IP)
@@ -159,7 +160,8 @@ new Array:g_UpgradeName, Array:g_UpgradeDesc, Array:g_UpgradePriceHandler, Array
 // Plugin Initializing
 public plugin_init() {
 	// Register Plugin
-	register_plugin("[ZPSp] Addon: XP System", "1.1", "Supremache | Perf. Scrash");
+	register_plugin("[ZPSp] Addon: XP System", "1.3", "Supremache | Perf. Scrash");
+	register_cvar("zpsp_xp_system", "1.3", FCVAR_SERVER|FCVAR_SPONLY)
 
 	// Dictionary
 	register_dictionary("zpsp_xp_system.txt")
@@ -609,8 +611,9 @@ public MenuBuyUpgrade(id) {
 	strcat(szText, fmt("%L %L^n^n", id, "ZP_XP_MENU_PREFIX", id, "ZP_XP_MENU_UPGRADES"), charsmax(szText))
 	strcat(szText, fmt("\w%L^n", id, "ZP_UPGRADE_ITEM_NAME", UpgradeName), charsmax(szText))
 	strcat(szText, fmt("\w%L^n", id, "ZP_UPGRADE_ITEM_LEVEL", CurrentLevel, MaxLvl), charsmax(szText))
-	strcat(szText, fmt("\w%L^n^n", id, "ZP_UPGRADE_ITEM_DESC", Description), charsmax(szText))
-	strcat(szText, fmt("\w%s\w^n", g_AdditionalNote), charsmax(szText))
+	strcat(szText, fmt("\w%L^n", id, "ZP_UPGRADE_ITEM_DESC", Description), charsmax(szText))
+	if(g_AdditionalNote[0]) strcat(szText, fmt("^n\w%s\w^n", g_AdditionalNote), charsmax(szText));
+
 	iMenu = menu_create(szText, "MenuBuyUpgradeHandler")
 	
 	g_AdditionalText = ""

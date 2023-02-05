@@ -13,6 +13,12 @@ and **zpsp_custom_weapons.ini** and you can change minimum level require for use
 * 1.1: 
     - Fix Load/Save XP/Upgrade
 
+* 1.2: 
+    - Fixed index out of bounds error
+
+* 1.3: 
+    - Fixed Save/Load XP/Level when user disconnect on loading
+
 ### Cvars:
 * zp_xp_save_type "1" ; Save Data Type: (1 - Authid | 2 = Name | 3 = IP)
 * zp_xp_for_kill "20" ; Xp For Kill Zombies/Humans
@@ -28,6 +34,7 @@ and **zpsp_custom_weapons.ini** and you can change minimum level require for use
 
 ### List Upgrades
 * Health (H/Z)
+* Armor (H) [Added 04-02-2023]
 * Gravity (H/Z)
 * Speed (H/Z)
 * Knockback (Z)

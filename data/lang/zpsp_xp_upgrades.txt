@@ -55,6 +55,10 @@ UPGRADE_RELOAD_DESC = Reduces reload time
 UPGRADE_RELOAD_NOTE = Your reload time was reduced in \y%d%%
 UPGRADE_RELOAD_NOTE2 = This upgrade don't affect some extra itens
 
+UPGRADE_ARMOR_NAME = Armor \y[Human]
+UPGRADE_ARMOR_DESC = Give a free anti-infection armor protection in every round
+UPGRADE_ARMOR_NOTE = You have \y+%d\w of Armor in every round
+
 UPGRADE_PARACHUTE_NAME = Parachute \y[Human]
 UPGRADE_PARACHUTE_DESC = \r[E]\w for use the parachute
 UPGRADE_PARA_FALLSPD_NAME = Fall Speed \d[Parachute]
@@ -122,6 +126,10 @@ UPGRADE_RELOAD_DESC = Reduz o tempo de recarga
 UPGRADE_RELOAD_NOTE = Seu tempo de recarga foi reduzido em \y%d%%
 UPGRADE_RELOAD_NOTE2 = Esse upgrade não afeta algumas armas dos itens extras
 
+UPGRADE_ARMOR_NAME = Colete \y[Humano]
+UPGRADE_ARMOR_DESC = Obtem um colete anti-infecção gratuitamete todo round
+UPGRADE_ARMOR_NOTE = Você tem \y+%d\w de Colete todos os rounds
+
 UPGRADE_PARACHUTE_NAME = Paraquedas \y[Humano]
 UPGRADE_PARACHUTE_DESC = \r[E]\w Para Usar o paraquedas
 UPGRADE_PARA_FALLSPD_NAME = Velocidade de Queda \d[Paraquedas]
@@ -188,6 +196,10 @@ UPGRADE_RELOAD_NAME = Tiempo de recarga \y[Humano]
 UPGRADE_RELOAD_DESC = Reducir el tiempo de recarga
 UPGRADE_RELOAD_NOTE = Su tiempo de recarga fue reducido en \y%d%%
 UPGRADE_RELOAD_NOTE2 = Esta mejora no afecta a algunas armas de los elementos adicionales.
+
+UPGRADE_ARMOR_NAME = Armadura \y[Humano]
+UPGRADE_ARMOR_DESC = Obtenga una armadura de anti-infección gratis en toda ronda
+UPGRADE_ARMOR_NOTE = Tu tienes \y+%d\w de armadura en toda ronda
 
 UPGRADE_PARACHUTE_NAME = Paracaídas \y[Humano]
 UPGRADE_PARACHUTE_DESC = \r[E]\w Para Usar el paraquedas
